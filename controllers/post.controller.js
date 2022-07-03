@@ -12,7 +12,7 @@ exports.getAllPosts = async (req, res) => {
 			.skip(perPage * page - perPage)
 			.limit(perPage)
 			.populate([
-				{ path: 'authorId', select: '_id username profilePicture' },
+				{ path: 'author', select: '_id username profilePicture' },
 				{ path: 'comments', select: '_id username profilePicture' },
 				{ path: 'likers', select: '_id username profilePicture' },
 			])
@@ -30,7 +30,7 @@ exports.getPost = async (req, res) => {
 	try {
 		const post = await Post.findById(id)
 			.populate([
-				{ path: 'authorId', select: '_id username profilePicture' },
+				{ path: 'author', select: '_id username profilePicture' },
 				{ path: 'comments', select: '_id username profilePicture' },
 				{ path: 'likers', select: '_id username profilePicture' },
 			])
@@ -52,10 +52,10 @@ exports.createPost = async (req, res) => {
 		return res.status(400).json({ message: 'Content is empty', type: 'error' });
 
 	try {
-		let newPost = new Post({ authorId: new mongoose.Types.ObjectId(authorId), text, file });
+		let newPost = new Post({ author: new mongoose.Types.ObjectId(authorId), text, file });
 		await newPost.save();
 		newPost = await newPost.populate([
-			{ path: 'authorId', select: '_id username profilePicture' },
+			{ path: 'author', select: '_id username profilePicture' },
 		]);
 		return res.status(200).json({
 			message: 'Create successfully',
@@ -84,7 +84,7 @@ exports.updatePost = async (req, res) => {
 					if (err) return res.status(400).send(err);
 					return res.send(post);
 				}
-			).populate([{ path: 'authorId' }, { path: 'comments' }]);
+			).populate([{ path: 'author' }, { path: 'comments' }]);
 		} catch (err) {
 			return res.status(400).json({ message: error.message, type: 'error' });
 		}

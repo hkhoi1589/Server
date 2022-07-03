@@ -5,7 +5,7 @@ const Post = mongoose.model(
 	'Posts',
 	new Schema(
 		{
-			authorId: { type: Schema.ObjectId, ref: 'Users' },
+			author: { type: Schema.ObjectId, ref: 'Users' },
 			comments: {
 				type: [
 					{
