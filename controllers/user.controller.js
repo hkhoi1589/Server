@@ -12,13 +12,6 @@ const sendToken = (user) =>
 	jwt.sign(
 		{
 			_id: user._id,
-			username: user.username,
-			email: user.email,
-			desc: user.desc,
-			coverPicture: user.coverPicture,
-			profilePicture: user.profilePicture,
-			followers: user.followers,
-			following: user.following,
 		},
 		process.env.JWT_KEY,
 		{
@@ -92,6 +85,7 @@ exports.register = async (req, res) => {
 			message: 'Register successfully',
 			type: 'success',
 			token,
+			user,
 		});
 	} catch (error) {
 		return res.status(500).json({ message: error.message, type: 'error' });
@@ -119,6 +113,7 @@ exports.login = async (req, res) => {
 			message: 'Login successfully',
 			type: 'success',
 			token,
+			user,
 		});
 	} catch (error) {
 		return res.status(500).json({ message: error.message, type: 'error' });
@@ -162,6 +157,7 @@ exports.updateUser = async (req, res) => {
 			type: 'success',
 			message: 'Update successfully',
 			token,
+			user,
 		});
 	} catch (error) {
 		return res.status(500).json({ message: error.message, type: 'error' });
@@ -264,7 +260,9 @@ exports.follow = async (req, res) => {
 			// gui lai token
 			const token = sendToken(user);
 
-			return res.status(200).json({ message: 'Followed this user', type: 'success', token });
+			return res
+				.status(200)
+				.json({ message: 'Followed this user', type: 'success', token, user });
 		} else {
 			return res
 				.status(403)
@@ -311,7 +309,7 @@ exports.unfollow = async (req, res) => {
 
 			return res
 				.status(200)
-				.json({ message: 'Unfollowed this friend', type: 'success', token });
+				.json({ message: 'Unfollowed this friend', type: 'success', token, user });
 		} else {
 			return res
 				.status(403)
