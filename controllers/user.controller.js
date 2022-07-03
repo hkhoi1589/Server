@@ -176,7 +176,7 @@ exports.deleteUser = async (req, res) => {
 		user.followers.map(async ({ _id, following }) => {
 			await User.findByIdAndUpdate(_id, {
 				$set: {
-					following: following.filter((f) => f._id.toString() !== friendId),
+					following: following.filter((f) => f._id.toString() !== id),
 				},
 			});
 		});
