@@ -229,9 +229,7 @@ exports.follow = async (req, res) => {
 	try {
 		// tim user
 		let user = await User.findById(id).populate([{ path: 'following', select: '_id' }]);
-		const friend = await User.findById(friendId).populate([
-			{ path: 'followers', select: '_id' },
-		]);
+		let friend = await User.findById(friendId).populate([{ path: 'followers', select: '_id' }]);
 
 		if (user.following.every((f) => f._id.toString() !== friendId)) {
 			await user.updateOne({
@@ -249,12 +247,8 @@ exports.follow = async (req, res) => {
 				},
 			});
 
-			// lay lai user
-			user = await User.findById(id)
-				.populate([{ path: 'following', select: '_id username profilePicture' }])
-				.lean();
-
-			return res.status(200).json({ message: 'Followed this user', type: 'success', user });
+			friend = friend.lean();
+			return res.status(200).json({ message: 'Followed this user', type: 'success', friend });
 		} else {
 			return res
 				.status(403)
@@ -274,9 +268,7 @@ exports.unfollow = async (req, res) => {
 	try {
 		// tim user
 		let user = await User.findById(id).populate([{ path: 'following', select: '_id' }]);
-		const friend = await User.findById(friendId).populate([
-			{ path: 'followers', select: '_id' },
-		]);
+		let friend = await User.findById(friendId).populate([{ path: 'followers', select: '_id' }]);
 
 		if (user.following.some((f) => f._id.toString() === friendId)) {
 			await user.updateOne({
@@ -291,14 +283,10 @@ exports.unfollow = async (req, res) => {
 				},
 			});
 
-			// lay lai user
-			user = await User.findById(id)
-				.populate([{ path: 'following', select: '_id username profilePicture' }])
-				.lean();
-
+			friend = friend.lean();
 			return res
 				.status(200)
-				.json({ message: 'Unfollowed this friend', type: 'success', user });
+				.json({ message: 'Unfollowed this friend', type: 'success', friend });
 		} else {
 			return res
 				.status(403)
