@@ -168,8 +168,8 @@ exports.deleteUser = async (req, res) => {
 	try {
 		// find and update
 		let user = await User.findById(id).populate([
-			{ path: 'following', select: '_id' },
-			{ path: 'followers', select: '_id' },
+			{ path: 'following', select: '_id followers' },
+			{ path: 'followers', select: '_id following' },
 		]);
 
 		// loai user khoi followers
@@ -191,7 +191,7 @@ exports.deleteUser = async (req, res) => {
 		});
 
 		// xoa user
-		user = await User.findByIdAndDelete(id).lean();
+		await User.findByIdAndDelete(id);
 
 		return res.status(200).json({ message: `Deleted: ${user.username}`, type: 'success' });
 	} catch (error) {
