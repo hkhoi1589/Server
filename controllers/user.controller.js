@@ -247,8 +247,7 @@ exports.follow = async (req, res) => {
 				},
 			});
 
-			friend = friend.lean();
-			return res.status(200).json({ message: 'Followed this user', type: 'success', friend });
+			return res.status(200).json({ message: 'Followed this user', type: 'success' });
 		} else {
 			return res
 				.status(403)
@@ -283,7 +282,6 @@ exports.unfollow = async (req, res) => {
 				},
 			});
 
-			friend = friend.lean();
 			return res
 				.status(200)
 				.json({ message: 'Unfollowed this friend', type: 'success', friend });
