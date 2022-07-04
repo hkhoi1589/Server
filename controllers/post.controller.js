@@ -203,9 +203,9 @@ exports.deletePost = async (req, res) => {
 		// loai post khoi nhung user da luu
 		const post = await Post.findById(id);
 		if (post.userSaved.length > 0) {
-			post.userSaved.map(({ _id }) => {
+			post.userSaved.map(async ({ _id }) => {
 				let userSaved = await User.findById(_id);
-				if(userSaved.saved.some((f) => f._id.toString() === id)){
+				if (userSaved.saved.some((f) => f._id.toString() === id)) {
 					await userSaved.updateOne({
 						$set: {
 							saved: userSaved.saved.filter((f) => f._id.toString() !== id),
