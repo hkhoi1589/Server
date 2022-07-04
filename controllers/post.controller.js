@@ -1,6 +1,7 @@
 const Post = require('../models').posts;
 const User = require('../models').users;
 const mongoose = require('mongoose');
+const { getUserId } = require('../helpers');
 
 //get 10 posts pagination
 exports.getAllPosts = async (req, res) => {
@@ -47,7 +48,9 @@ exports.getPost = async (req, res) => {
 
 //create a post
 exports.createPost = async (req, res) => {
-	const { authorId, text, file } = req.body;
+	const { text, file } = req.body;
+	const authorId = getUserId(req);
+
 	if (text.length === 0 && file.length === 0)
 		return res.status(400).json({ message: 'Content is empty', type: 'error' });
 
@@ -194,8 +197,6 @@ exports.updatePost = async (req, res) => {
 // delete post
 exports.deletePost = async (req, res) => {
 	const { id } = req.params;
-	const { userId } = req.body;
-	if (!userId) return res.status(404).json({ message: 'No user ID found', type: 'error' });
 
 	try {
 		// find and update
@@ -217,12 +218,14 @@ exports.deletePost = async (req, res) => {
 // save
 exports.save = async (req, res) => {
 	const { id } = req.params;
-	const { userId } = req.body;
+	const userId = getUserId(req);
 	if (!userId) return res.status(404).json({ message: 'No user ID found', type: 'error' });
 
 	try {
 		// tim user
-		const user = await User.findById(userId).populate([{ path: 'saved', select: '_id' }]);
+		let user = await User.findById(userId).populate([{ path: 'saved', select: '_id' }]);
+		// tim post
+		const post = await Post.findById(id);
 
 		if (user.saved.every((f) => f._id.toString() !== id)) {
 			await user.updateOne({
@@ -232,9 +235,16 @@ exports.save = async (req, res) => {
 					},
 				},
 			});
+			await post.updateOne({
+				$push: {
+					userSaved: {
+						_id: userId,
+					},
+				},
+			});
 
 			// lay lai user
-			const newUser = await User.findById(userId)
+			user = await User.findById(userId)
 				.populate([
 					{
 						path: 'saved',
@@ -242,7 +252,7 @@ exports.save = async (req, res) => {
 					},
 				])
 				.lean();
-			return res.status(200).json({ message: 'Saved this post', type: 'success', newUser });
+			return res.status(200).json({ message: 'Saved this post', type: 'success', user });
 		} else {
 			return res
 				.status(403)
@@ -256,12 +266,14 @@ exports.save = async (req, res) => {
 // unsave
 exports.unsave = async (req, res) => {
 	const { id } = req.params;
-	const { userId } = req.body;
+	const userId = getUserId(req);
 	if (!userId) return res.status(404).json({ message: 'No user ID found', type: 'error' });
 
 	try {
 		// tim user
-		const user = await User.findById(userId).populate([{ path: 'saved', select: '_id' }]);
+		let user = await User.findById(userId).populate([{ path: 'saved', select: '_id' }]);
+		// tim post
+		const post = await Post.findById(id);
 
 		if (user.saved.some((f) => f._id.toString() === id)) {
 			await user.updateOne({
@@ -269,9 +281,14 @@ exports.unsave = async (req, res) => {
 					saved: user.saved.filter((f) => f._id.toString() !== id),
 				},
 			});
+			await post.updateOne({
+				$set: {
+					userSaved: post.userSaved.filter((f) => f._id !== userId),
+				},
+			});
 
 			// lay lai user
-			const newUser = await User.findById(userId)
+			user = await User.findById(userId)
 				.populate([
 					{
 						path: 'saved',
@@ -280,7 +297,7 @@ exports.unsave = async (req, res) => {
 				])
 				.lean();
 
-			return res.status(200).json({ message: 'Unsave this post', type: 'success', newUser });
+			return res.status(200).json({ message: 'Unsave this post', type: 'success', user });
 		} else {
 			return res
 				.status(403)

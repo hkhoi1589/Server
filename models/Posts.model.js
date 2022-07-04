@@ -29,6 +29,10 @@ const Post = mongoose.model(
 				type: String,
 				default: '',
 			},
+			userSaved: {
+				type: [{ type: String }],
+				default: [],
+			},
 		},
 		{ timestamps: true }
 	)
