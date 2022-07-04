@@ -11,9 +11,11 @@ exports.getAllPosts = async (req, res) => {
 
 	try {
 		let followings = await User.findById(userId).select('following'); // lay cac following
+		followings = followings.following;
 
 		// cac post co author trong followings, timestamp desc
-		const posts = await Post.find({ author: { $in: followings } }, { timestamp: -1 })
+		const posts = await Post.find({ author: { $in: followings } })
+			.sort({ createdAt: 'desc' }) // sap xep desc
 			.skip(perPage * page - perPage)
 			.limit(perPage)
 			.populate([
