@@ -3,13 +3,17 @@ const User = require('../models').users;
 const mongoose = require('mongoose');
 const { getUserId } = require('../helpers');
 
-//get 10 posts pagination
+//get 10 posts pagination from following
 exports.getAllPosts = async (req, res) => {
 	let perPage = 10; // số lượng post xuất hiện trên 1 page
 	const { page } = req.params;
+	const userId = getUserId(req);
 
 	try {
-		const posts = await Post.find({ timestamp: -1 })
+		let followings = await User.findById(userId).select('following'); // lay cac following
+
+		// cac post co author trong followings, timestamp desc
+		const posts = await Post.find({ author: { $in: followings } }, { timestamp: -1 })
 			.skip(perPage * page - perPage)
 			.limit(perPage)
 			.populate([
