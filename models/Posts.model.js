@@ -30,7 +30,7 @@ const Post = mongoose.model(
 				default: '',
 			},
 			userSaved: {
-				type: [{ type: String }],
+				type: [String],
 				default: [],
 			},
 		},
