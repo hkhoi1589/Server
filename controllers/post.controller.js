@@ -212,7 +212,7 @@ exports.save = async (req, res) => {
 
 	try {
 		// tim user
-		let user = await User.findById(id).populate([{ path: 'saved', select: '_id' }]);
+		let user = await User.findById(userId).populate([{ path: 'saved', select: '_id' }]);
 
 		if (user.saved.every((f) => f._id.toString() !== id)) {
 			await user.updateOne({
@@ -247,7 +247,7 @@ exports.unsave = async (req, res) => {
 
 	try {
 		// tim user
-		let user = await User.findById(id).populate([{ path: 'saved', select: '_id' }]);
+		let user = await User.findById(userId).populate([{ path: 'saved', select: '_id' }]);
 
 		if (user.saved.some((f) => f._id.toString() === id)) {
 			await user.updateOne({
