@@ -1,5 +1,6 @@
 const User = require('../models').users;
 const mongoose = require('mongoose');
+const bcrypt = require('bcrypt');
 const { handlePassword, sendToken, getUserId } = require('../helpers');
 
 // Get random friend
