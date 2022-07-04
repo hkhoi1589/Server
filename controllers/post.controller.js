@@ -223,7 +223,12 @@ exports.save = async (req, res) => {
 				},
 			});
 
-			return res.status(200).json({ message: 'Saved this post', type: 'success' });
+			// lay lai user
+			user = await User.findById(userId)
+				.populate([{ path: 'saved' }])
+				.lean();
+
+			return res.status(200).json({ message: 'Saved this post', type: 'success', user });
 		} else {
 			return res
 				.status(403)
@@ -251,7 +256,12 @@ exports.unsave = async (req, res) => {
 				},
 			});
 
-			return res.status(200).json({ message: 'Unsave this post', type: 'success' });
+			// lay lai user
+			user = await User.findById(userId)
+				.populate([{ path: 'saved' }])
+				.lean();
+
+			return res.status(200).json({ message: 'Unsave this post', type: 'success', user });
 		} else {
 			return res
 				.status(403)
