@@ -194,18 +194,8 @@ exports.updatePost = async (req, res) => {
 // delete post
 exports.deletePost = async (req, res) => {
 	const { id } = req.params;
-	const { userId } = req.body;
-	if (!userId) return res.status(404).json({ message: 'No user ID found', type: 'error' });
 
 	try {
-		// find and update
-		let user = await User.findById(userId).populate([{ path: 'saved', select: '_id' }]);
-
-		// loai post khoi user.saved
-		if (user.saved.some((f) => f._id.toString() === id)) {
-			user.saved = user.saved.filter((f) => f._id.toString() !== id);
-		}
-
 		// find and update
 		await Post.findByIdAndDelete(id);
 		return res.status(200).json({ message: `Deleted post`, type: 'success' });
