@@ -212,7 +212,7 @@ exports.save = async (req, res) => {
 
 	try {
 		// tim user
-		let user = await User.findById(userId).populate([{ path: 'saved', select: '_id' }]);
+		const user = await User.findById(userId).populate([{ path: 'saved', select: '_id' }]);
 
 		if (user.saved.every((f) => f._id.toString() !== id)) {
 			await user.updateOne({
@@ -224,11 +224,11 @@ exports.save = async (req, res) => {
 			});
 
 			// lay lai user
-			user = await User.findById(userId)
+			const newUser = await User.findById(userId)
 				.populate([{ path: 'saved' }])
 				.lean();
 
-			return res.status(200).json({ message: 'Saved this post', type: 'success', user });
+			return res.status(200).json({ message: 'Saved this post', type: 'success', newUser });
 		} else {
 			return res
 				.status(403)
@@ -247,7 +247,7 @@ exports.unsave = async (req, res) => {
 
 	try {
 		// tim user
-		let user = await User.findById(userId).populate([{ path: 'saved', select: '_id' }]);
+		const user = await User.findById(userId).populate([{ path: 'saved', select: '_id' }]);
 
 		if (user.saved.some((f) => f._id.toString() === id)) {
 			await user.updateOne({
@@ -257,11 +257,11 @@ exports.unsave = async (req, res) => {
 			});
 
 			// lay lai user
-			user = await User.findById(userId)
+			const newUser = await User.findById(userId)
 				.populate([{ path: 'saved' }])
 				.lean();
 
-			return res.status(200).json({ message: 'Unsave this post', type: 'success', user });
+			return res.status(200).json({ message: 'Unsave this post', type: 'success', newUser });
 		} else {
 			return res
 				.status(403)
