@@ -198,13 +198,12 @@ exports.updatePost = async (req, res) => {
 exports.deletePost = async (req, res) => {
 	const { id } = req.params;
 	const userId = getUserId(req);
-
 	try {
 		// loai post khoi nhung user da luu
 		const post = await Post.findById(id);
 		if (post.userSaved.length > 0) {
-			post.userSaved.map(async ({ _id }) => {
-				let userSaved = await User.findById(_id);
+			post.userSaved.map(async (saveUser) => {
+				let userSaved = await User.findById(saveUser);
 				if (userSaved.saved.some((f) => f._id.toString() === id)) {
 					await userSaved.updateOne({
 						$set: {
