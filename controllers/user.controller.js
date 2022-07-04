@@ -156,6 +156,7 @@ exports.updateUser = async (req, res) => {
 		)
 			.populate([
 				{ path: 'following', select: '_id username profilePicture' },
+				{ path: 'followers', select: '_id username profilePicture' },
 				{ path: 'saved' },
 			])
 			.lean();
@@ -264,6 +265,7 @@ exports.follow = async (req, res) => {
 			user = await User.findById(id)
 				.populate([
 					{ path: 'following', select: '_id username profilePicture' },
+					{ path: 'followers', select: '_id username profilePicture' },
 					{ path: 'saved' },
 				])
 				.lean();
@@ -309,6 +311,7 @@ exports.unfollow = async (req, res) => {
 			user = await User.findById(id)
 				.populate([
 					{ path: 'following', select: '_id username profilePicture' },
+					{ path: 'followers', select: '_id username profilePicture' },
 					{ path: 'saved' },
 				])
 				.lean();
