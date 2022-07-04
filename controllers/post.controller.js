@@ -200,7 +200,14 @@ exports.deletePost = async (req, res) => {
 
 	try {
 		// find and update
-		let user = await User.findById(userId).populate([{ path: 'saved', select: '_id' }]);
+		let user = await User.findById(userId).populate([
+			{ path: 'following', select: '_id username profilePicture' },
+			{ path: 'followers', select: '_id username profilePicture' },
+			{
+				path: 'saved',
+				populate: { path: 'author', select: '_id username profilePicture' },
+			},
+		]);
 
 		// loai post khoi user.saved
 		if (user.saved.some((f) => f._id.toString() === id)) {
