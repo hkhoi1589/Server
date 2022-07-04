@@ -199,14 +199,32 @@ exports.deleteUser = async (req, res) => {
 // Get user by id
 exports.getUser = async (req, res) => {
 	const { id } = req.params;
+	const authId = getUserId(req);
 
 	try {
-		const user = await User.findById(id)
-			.populate([
-				{ path: 'following', select: '_id username profilePicture' },
-				{ path: 'followers', select: '_id username profilePicture' },
-			])
-			.lean();
+		let user;
+		if (authId === id) {
+			// neu la authUser
+			user = await User.findById(id)
+				.populate([
+					{ path: 'following', select: '_id username profilePicture' },
+					{ path: 'followers', select: '_id username profilePicture' },
+					{
+						path: 'saved',
+						populate: { path: 'author', select: '_id username profilePicture' },
+					},
+				])
+				.lean();
+		} else {
+			// neu khong
+			user = await User.findById(id)
+				.populate([
+					{ path: 'following', select: '_id username profilePicture' },
+					{ path: 'followers', select: '_id username profilePicture' },
+				])
+				.lean();
+		}
+
 		if (user) {
 			return res.status(200).json(user);
 		} else {
