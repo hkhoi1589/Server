@@ -10,10 +10,11 @@ exports.getAllPosts = async (req, res) => {
 	const userId = getUserId(req);
 
 	try {
-		let followings = await User.findById(userId).select('following'); // lay cac following
-		followings = followings.following;
+		// lay cac following + userId
+		let followings = await User.findById(userId).select('following');
+		followings = [...followings.following, new mongoose.Types.ObjectId(userId)];
 
-		// cac post co author trong followings, timestamp desc
+		// cac post co author trong followings
 		const posts = await Post.find({ author: { $in: followings } })
 			.sort({ createdAt: 'desc' }) // sap xep desc
 			.skip(perPage * page - perPage)
