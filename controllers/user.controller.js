@@ -60,9 +60,7 @@ exports.register = async (req, res) => {
 	const { username, email, password } = req.body;
 
 	try {
-		const existedUser = await User.findOne({ email })
-			.populate([{ path: 'following' }])
-			.lean();
+		const existedUser = await User.findOne({ email }).lean();
 		if (existedUser)
 			return res.status(404).json({ message: 'This email is already used', type: 'error' });
 
@@ -98,7 +96,10 @@ exports.login = async (req, res) => {
 	try {
 		// Find user
 		const user = await User.findOne({ email })
-			.populate([{ path: 'following', select: '_id username profilePicture' }])
+			.populate([
+				{ path: 'following', select: '_id username profilePicture' },
+				{ path: 'saved' },
+			])
 			.lean();
 		if (!user) return res.status(404).json({ message: 'User is not found', type: 'error' });
 
@@ -146,7 +147,10 @@ exports.updateUser = async (req, res) => {
 			},
 			{ new: true } // tra ve document da update
 		)
-			.populate([{ path: 'following', select: '_id username profilePicture' }])
+			.populate([
+				{ path: 'following', select: '_id username profilePicture' },
+				{ path: 'saved' },
+			])
 			.lean();
 
 		if (!user) return res.status(404).json({ message: 'User not found.', type: 'error' });
@@ -251,7 +255,10 @@ exports.follow = async (req, res) => {
 
 			// lay lai user
 			user = await User.findById(id)
-				.populate([{ path: 'following', select: '_id username profilePicture' }])
+				.populate([
+					{ path: 'following', select: '_id username profilePicture' },
+					{ path: 'saved' },
+				])
 				.lean();
 
 			return res.status(200).json({ message: 'Followed this user', type: 'success', user });
@@ -293,7 +300,10 @@ exports.unfollow = async (req, res) => {
 
 			// lay lai user
 			user = await User.findById(id)
-				.populate([{ path: 'following', select: '_id username profilePicture' }])
+				.populate([
+					{ path: 'following', select: '_id username profilePicture' },
+					{ path: 'saved' },
+				])
 				.lean();
 
 			return res
