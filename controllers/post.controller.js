@@ -197,9 +197,28 @@ exports.updatePost = async (req, res) => {
 // delete post
 exports.deletePost = async (req, res) => {
 	const { id } = req.params;
+	const userId = getUserId(req);
 
 	try {
-		// find and update
+		// loai post khoi nhung user da luu
+		const post = await Post.findById(id);
+		if (post.userSaved.length > 0) {
+			post.userSaved.map(({ _id }) => {
+				let userSaved = await User.findById(_id);
+				if(userSaved.saved.some((f) => f._id.toString() === id)){
+					await userSaved.updateOne({
+						$set: {
+							saved: userSaved.saved.filter((f) => f._id.toString() !== id),
+						},
+					});
+				}
+			});
+		}
+
+		// xoa post
+		await Post.findByIdAndDelete(id);
+
+		// lay lai user hien tai
 		let user = await User.findById(userId).populate([
 			{ path: 'following', select: '_id username profilePicture' },
 			{ path: 'followers', select: '_id username profilePicture' },
@@ -208,14 +227,6 @@ exports.deletePost = async (req, res) => {
 				populate: { path: 'author', select: '_id username profilePicture' },
 			},
 		]);
-
-		// loai post khoi user.saved
-		if (user.saved.some((f) => f._id.toString() === id)) {
-			user.saved = user.saved.filter((f) => f._id.toString() !== id);
-		}
-
-		// find and update
-		await Post.findByIdAndDelete(id);
 		return res.status(200).json({ message: `Deleted post`, type: 'success', user });
 	} catch (error) {
 		return res.status(500).json({ message: error.message, type: 'error' });
@@ -234,7 +245,10 @@ exports.save = async (req, res) => {
 		// tim post
 		const post = await Post.findById(id);
 
-		if (user.saved.every((f) => f._id.toString() !== id)) {
+		if (
+			user.saved.every((f) => f._id.toString() !== id) &&
+			post.userSaved.every((f) => f._id !== userId)
+		) {
 			await user.updateOne({
 				$push: {
 					saved: {
@@ -284,7 +298,10 @@ exports.unsave = async (req, res) => {
 		// tim post
 		const post = await Post.findById(id);
 
-		if (user.saved.some((f) => f._id.toString() === id)) {
+		if (
+			user.saved.some((f) => f._id.toString() === id) &&
+			post.userSaved.some((f) => f._id === userId)
+		) {
 			await user.updateOne({
 				$set: {
 					saved: user.saved.filter((f) => f._id.toString() !== id),
