@@ -60,13 +60,8 @@ exports.register = async (req, res) => {
 	const { username, email, password } = req.body;
 
 	try {
-		const existedUser = await User.findOne({ email })
-			.populate([
-				{ path: 'following', select: '_id username profilePicture' },
-				{ path: 'followers', select: '_id username profilePicture' },
-				{ path: 'saved' },
-			])
-			.lean();
+		const existedUser = await User.findOne({ email });
+
 		if (existedUser)
 			return res.status(404).json({ message: 'This email is already used', type: 'error' });
 

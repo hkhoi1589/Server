@@ -10,7 +10,7 @@ router.post('/create', postCtrl.createPost);
 // Update post
 router.put('/:id', postCtrl.updatePost);
 // Delete post
-router.delete('/:id', postCtrl.deletePost);
+router.put('/:id', postCtrl.deletePost);
 // Save a post
 router.put('/save/:id', postCtrl.save);
 // Unsave a post
