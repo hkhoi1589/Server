@@ -100,7 +100,10 @@ exports.login = async (req, res) => {
 			.populate([
 				{ path: 'following', select: '_id username profilePicture' },
 				{ path: 'followers', select: '_id username profilePicture' },
-				{ path: 'saved' },
+				{
+					path: 'saved',
+					populate: { path: 'author', select: '_id username profilePicture' },
+				},
 			])
 			.lean();
 		if (!user) return res.status(404).json({ message: 'User is not found', type: 'error' });
@@ -152,7 +155,10 @@ exports.updateUser = async (req, res) => {
 			.populate([
 				{ path: 'following', select: '_id username profilePicture' },
 				{ path: 'followers', select: '_id username profilePicture' },
-				{ path: 'saved' },
+				{
+					path: 'saved',
+					populate: { path: 'author', select: '_id username profilePicture' },
+				},
 			])
 			.lean();
 
@@ -261,7 +267,10 @@ exports.follow = async (req, res) => {
 				.populate([
 					{ path: 'following', select: '_id username profilePicture' },
 					{ path: 'followers', select: '_id username profilePicture' },
-					{ path: 'saved' },
+					{
+						path: 'saved',
+						populate: { path: 'author', select: '_id username profilePicture' },
+					},
 				])
 				.lean();
 
@@ -307,7 +316,10 @@ exports.unfollow = async (req, res) => {
 				.populate([
 					{ path: 'following', select: '_id username profilePicture' },
 					{ path: 'followers', select: '_id username profilePicture' },
-					{ path: 'saved' },
+					{
+						path: 'saved',
+						populate: { path: 'author', select: '_id username profilePicture' },
+					},
 				])
 				.lean();
 
