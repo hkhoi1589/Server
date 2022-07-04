@@ -8,7 +8,7 @@ router.get('/:id', postCtrl.getPost);
 // create a post
 router.post('/create', postCtrl.createPost);
 // Update post
-router.put('/:id', postCtrl.updatePost);
+router.put('/:id', postCtrl.updatePost); // trung route delete
 // Delete post
 router.put('/:id', postCtrl.deletePost);
 // Save a post

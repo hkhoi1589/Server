@@ -1,23 +1,6 @@
 const User = require('../models').users;
-const jwt = require('jsonwebtoken');
-const bcrypt = require('bcrypt');
 const mongoose = require('mongoose');
-
-const handlePassword = async (password) => {
-	const salt = await bcrypt.genSalt(10);
-	return bcrypt.hash(password, salt);
-};
-
-const sendToken = (user) =>
-	jwt.sign(
-		{
-			_id: user._id,
-		},
-		process.env.JWT_KEY,
-		{
-			expiresIn: '24h',
-		}
-	);
+const { handlePassword, sendToken, getUserId } = require('../helpers');
 
 // Get random friend
 exports.getFriend = async (req, res) => {
@@ -129,7 +112,7 @@ exports.login = async (req, res) => {
 // update user
 exports.updateUser = async (req, res) => {
 	const { username, email, password, desc, coverPicture, profilePicture } = req.body;
-	const { id } = req.params;
+	const id = getUserId(req);
 
 	try {
 		const existedUser = await User.findOne({ email, _id: { $nin: [id] } }); // kiem tra trung email, ngoai tru user
@@ -176,7 +159,7 @@ exports.updateUser = async (req, res) => {
 
 // delete user
 exports.deleteUser = async (req, res) => {
-	const { id } = req.params;
+	const id = getUserId(req);
 
 	try {
 		// find and update
@@ -235,8 +218,8 @@ exports.getUser = async (req, res) => {
 
 // follow
 exports.follow = async (req, res) => {
-	const { id } = req.params;
-	const { friendId } = req.body;
+	const { friendId } = req.params;
+	const id = getUserId(req);
 	if (!friendId) return res.status(404).json({ message: 'No ID found', type: 'error' });
 
 	try {
@@ -287,8 +270,8 @@ exports.follow = async (req, res) => {
 
 // unfollow
 exports.unfollow = async (req, res) => {
-	const { id } = req.params;
-	const { friendId } = req.body;
+	const { friendId } = req.params;
+	const id = getUserId(req);
 	if (!friendId) return res.status(404).json({ message: 'No ID found', type: 'error' });
 
 	try {
