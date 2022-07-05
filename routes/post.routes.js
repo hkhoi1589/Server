@@ -3,6 +3,8 @@ const postCtrl = require('../controllers/post.controller');
 
 // get 10 posts pagination
 router.get('/page/:page', postCtrl.getAllPosts);
+// get 10 posts by authorId
+router.get('/:authorId/page/:page', postCtrl.getAllPostsByUser);
 // Get a post
 router.get('/:id', postCtrl.getPost);
 // create a post

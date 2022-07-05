@@ -31,6 +31,29 @@ exports.getAllPosts = async (req, res) => {
 	}
 };
 
+//get 10 posts from user
+exports.getAllPostsByUser = async (req, res) => {
+	let perPage = 10; // số lượng post xuất hiện trên 1 page
+	const { page, authorId } = req.params;
+
+	try {
+		// cac post co author trong followings
+		const posts = await Post.find({ author: new mongoose.Types.ObjectId(authorId) })
+			.sort({ createdAt: 'desc' }) // sap xep desc
+			.skip(perPage * page - perPage)
+			.limit(perPage)
+			.populate([
+				{ path: 'author', select: '_id username profilePicture' },
+				{ path: 'comments', select: '_id username profilePicture' },
+				{ path: 'likers', select: '_id username profilePicture' },
+			])
+			.lean();
+		return res.status(200).json(posts);
+	} catch (error) {
+		return res.status(500).json({ message: error.message, type: 'error' });
+	}
+};
+
 // get a post by id
 exports.getPost = async (req, res) => {
 	const { id } = req.params;
