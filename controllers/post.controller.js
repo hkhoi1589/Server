@@ -226,8 +226,6 @@ exports.deletePost = async (req, res) => {
 
 		// lay lai user hien tai
 		let user = await User.findById(userId).populate([
-			{ path: 'following', select: '_id username profilePicture' },
-			{ path: 'followers', select: '_id username profilePicture' },
 			{
 				path: 'saved',
 				populate: { path: 'author', select: '_id username profilePicture' },
@@ -273,8 +271,6 @@ exports.save = async (req, res) => {
 			// lay lai user
 			user = await User.findById(userId)
 				.populate([
-					{ path: 'following', select: '_id username profilePicture' },
-					{ path: 'followers', select: '_id username profilePicture' },
 					{
 						path: 'saved',
 						populate: { path: 'author', select: '_id username profilePicture' },
@@ -322,8 +318,6 @@ exports.unsave = async (req, res) => {
 			// lay lai user
 			user = await User.findById(userId)
 				.populate([
-					{ path: 'following', select: '_id username profilePicture' },
-					{ path: 'followers', select: '_id username profilePicture' },
 					{
 						path: 'saved',
 						populate: { path: 'author', select: '_id username profilePicture' },
