@@ -135,16 +135,7 @@ exports.updateUser = async (req, res) => {
 				desc: desc,
 			},
 			{ new: true } // tra ve document da update
-		)
-			.populate([
-				{ path: 'following', select: '_id username profilePicture' },
-				{ path: 'followers', select: '_id username profilePicture' },
-				{
-					path: 'saved',
-					populate: { path: 'author', select: '_id username profilePicture' },
-				},
-			])
-			.lean();
+		).lean();
 
 		if (!user) return res.status(404).json({ message: 'User not found.', type: 'error' });
 
@@ -266,14 +257,7 @@ exports.follow = async (req, res) => {
 
 			// lay lai user
 			user = await User.findById(id)
-				.populate([
-					{ path: 'following', select: '_id username profilePicture' },
-					{ path: 'followers', select: '_id username profilePicture' },
-					{
-						path: 'saved',
-						populate: { path: 'author', select: '_id username profilePicture' },
-					},
-				])
+				.populate([{ path: 'following', select: '_id username profilePicture' }])
 				.lean();
 
 			return res.status(200).json({ message: 'Followed this user', type: 'success', user });
@@ -315,14 +299,7 @@ exports.unfollow = async (req, res) => {
 
 			// lay lai user
 			user = await User.findById(id)
-				.populate([
-					{ path: 'following', select: '_id username profilePicture' },
-					{ path: 'followers', select: '_id username profilePicture' },
-					{
-						path: 'saved',
-						populate: { path: 'author', select: '_id username profilePicture' },
-					},
-				])
+				.populate([{ path: 'following', select: '_id username profilePicture' }])
 				.lean();
 
 			return res
