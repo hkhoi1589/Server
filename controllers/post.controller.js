@@ -315,7 +315,7 @@ exports.unsave = async (req, res) => {
 			});
 			await post.updateOne({
 				$set: {
-					userSaved: post.userSaved.filter((f) => f._id !== userId),
+					userSaved: post.userSaved.filter((f) => f !== userId),
 				},
 			});
 
