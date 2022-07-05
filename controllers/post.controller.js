@@ -306,7 +306,7 @@ exports.unsave = async (req, res) => {
 
 		if (
 			user.saved.some((f) => f._id.toString() === id) &&
-			post.userSaved.some((f) => f._id === userId)
+			post.userSaved.some((f) => f === userId)
 		) {
 			await user.updateOne({
 				$set: {
