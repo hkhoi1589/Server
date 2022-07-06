@@ -69,7 +69,7 @@ exports.getPost = async (req, res) => {
 		if (post) {
 			return res.status(200).json(post);
 		} else {
-			return res.status(404).json({ message: 'Post is not found', type: 'error' });
+			return res.json({ message: 'Post is not found', type: 'error' });
 		}
 	} catch (error) {
 		return res.status(500).json({ message: error.message, type: 'error' });
@@ -82,7 +82,7 @@ exports.createPost = async (req, res) => {
 	const authorId = getUserId(req);
 
 	if (text.length === 0 && file.length === 0)
-		return res.status(400).json({ message: 'Content is empty', type: 'error' });
+		return res.json({ message: 'Content is empty', type: 'error' });
 
 	try {
 		let newPost = new Post({ author: new mongoose.Types.ObjectId(authorId), text, file });
@@ -106,7 +106,7 @@ exports.updatePost = async (req, res) => {
 
 	if (req.body.action === 'like') {
 		try {
-			const post = Post.findByIdAndUpdate(
+			const post = await Post.findByIdAndUpdate(
 				id,
 				{
 					$push: { likers: req.body.userId },
@@ -117,7 +117,7 @@ exports.updatePost = async (req, res) => {
 			if (post) {
 				return res.status(200).json(post);
 			} else {
-				return res.status(404).json({ message: 'Post is not found', type: 'error' });
+				return res.json({ message: 'Post is not found', type: 'error' });
 			}
 		} catch (error) {
 			return res.status(500).json({ message: error.message, type: 'error' });
@@ -126,7 +126,7 @@ exports.updatePost = async (req, res) => {
 
 	if (req.body.action === 'unlike') {
 		try {
-			const post = Post.findByIdAndUpdate(
+			const post = await Post.findByIdAndUpdate(
 				id,
 				{
 					$pull: { likers: req.body.userId },
@@ -137,7 +137,7 @@ exports.updatePost = async (req, res) => {
 			if (post) {
 				return res.status(200).json(post);
 			} else {
-				return res.status(404).json({ message: 'Post is not found', type: 'error' });
+				return res.json({ message: 'Post is not found', type: 'error' });
 			}
 		} catch (error) {
 			return res.status(500).json({ message: error.message, type: 'error' });
@@ -146,7 +146,7 @@ exports.updatePost = async (req, res) => {
 
 	if (req.body.action === 'addComment') {
 		try {
-			const post = Post.findByIdAndUpdate(
+			const post = await Post.findByIdAndUpdate(
 				id,
 				{
 					$push: {
@@ -161,7 +161,7 @@ exports.updatePost = async (req, res) => {
 			if (post) {
 				return res.status(200).json(post);
 			} else {
-				return res.status(404).json({ message: 'Post is not found', type: 'error' });
+				return res.json({ message: 'Post is not found', type: 'error' });
 			}
 		} catch (error) {
 			return res.status(500).json({ message: error.message, type: 'error' });
@@ -170,12 +170,9 @@ exports.updatePost = async (req, res) => {
 
 	if (req.body.action === 'deleteComment') {
 		try {
-			const post = Post.findByIdAndUpdate(
+			const post = await Post.findByIdAndUpdate(
 				id,
 				{
-					$set: {
-						comments: comments.filter((f) => f.user !== friendId),
-					},
 					$pull: {
 						comments: {
 							_id: req.body.commentId,
@@ -187,23 +184,8 @@ exports.updatePost = async (req, res) => {
 			if (post) {
 				return res.status(200).json(post);
 			} else {
-				return res.status(404).json({ message: 'Post is not found', type: 'error' });
+				return res.json({ message: 'Post is not found', type: 'error' });
 			}
-			return Post.findByIdAndUpdate(
-				id,
-				{
-					$pull: {
-						comments: {
-							_id: req.body.commentId,
-						},
-					},
-				},
-				{ new: true },
-				(err, post) => {
-					if (err) return res.status(400).send(err);
-					return res.send(post);
-				}
-			);
 		} catch (error) {
 			return res.status(500).json({ message: error.message, type: 'error' });
 		}
@@ -211,35 +193,37 @@ exports.updatePost = async (req, res) => {
 
 	if (req.body.action === 'editComment') {
 		try {
-			return Post.findById(id, (err, post) => {
-				const { comments } = post;
-				const theComment = comments.find((comment) =>
-					comment._id.equals(req.body.commentId)
-				);
+			const post = await Post.findById(id);
 
-				if (!theComment) return res.status(404).send('Comment not found');
+			if (post) {
+				const { comments } = post;
+				const theComment = comments.find((comment) => comment._id === req.body.commentId);
+
+				if (!theComment) return res.json({ message: 'Comment not found', type: 'error' });
 				theComment.text = req.body.text;
 
-				return post.save((error) => {
-					if (error) return res.status(500).send(error);
-					return res.status(200).send(post);
-				});
-			});
+				await post.save();
+
+				return res.status(200).json(post.lean());
+			} else {
+				return res.json({ message: 'Post is not found', type: 'error' });
+			}
 		} catch (error) {
 			return res.status(500).json({ message: error.message, type: 'error' });
 		}
 	}
 
 	try {
-		return Post.findByIdAndUpdate(
+		const post = await Post.findByIdAndUpdate(
 			id,
 			{ $set: { text: req.body.text } },
-			{ new: true },
-			(err, post) => {
-				if (err) return res.status(400).send(err);
-				return res.send(post);
-			}
-		);
+			{ new: true }
+		).lean();
+		if (post) {
+			return res.status(200).json(post);
+		} else {
+			return res.json({ message: 'Post is not found', type: 'error' });
+		}
 	} catch (error) {
 		return res.status(500).json({ message: error.message, type: 'error' });
 	}
@@ -285,35 +269,21 @@ exports.deletePost = async (req, res) => {
 exports.save = async (req, res) => {
 	const { id } = req.params;
 	const userId = getUserId(req);
-	if (!userId) return res.status(404).json({ message: 'No user ID found', type: 'error' });
+	if (!userId) return res.json({ message: 'No user ID found', type: 'error' });
 
 	try {
-		// tim user
-		let user = await User.findById(userId).populate([{ path: 'saved', select: '_id' }]);
-		// tim post
-		const post = await Post.findById(id);
+		try {
+			const post = await Post.find({ _id: id, userSaved: userId });
+			if (post.length > 0)
+				return res.json({ message: 'You should unsave this post first', type: 'error' });
 
-		if (
-			user.saved.every((f) => f._id.toString() !== id) &&
-			post.userSaved.every((f) => f._id !== userId)
-		) {
-			await user.updateOne({
-				$push: {
-					saved: {
-						_id: new mongoose.Types.ObjectId(id),
-					},
+			const user = await User.findOneAndUpdate(
+				{ _id: userId },
+				{
+					$push: { saved: new mongoose.Types.ObjectId(id) },
 				},
-			});
-			await post.updateOne({
-				$push: {
-					userSaved: {
-						_id: userId,
-					},
-				},
-			});
-
-			// lay lai user
-			user = await User.findById(userId)
+				{ new: true }
+			)
 				.populate([
 					{
 						path: 'saved',
@@ -321,11 +291,18 @@ exports.save = async (req, res) => {
 					},
 				])
 				.lean();
+
+			await Post.findOneAndUpdate(
+				{ _id: id },
+				{
+					$push: { userSaved: userId },
+				},
+				{ new: true }
+			);
+
 			return res.status(200).json({ message: 'Saved this post', type: 'success', user });
-		} else {
-			return res
-				.status(403)
-				.json({ message: 'You should unsave this post first', type: 'error' });
+		} catch (error) {
+			return res.status(500).json({ message: error.message, type: 'error' });
 		}
 	} catch (error) {
 		return res.status(500).json({ message: error.message, type: 'error' });
@@ -336,45 +313,37 @@ exports.save = async (req, res) => {
 exports.unsave = async (req, res) => {
 	const { id } = req.params;
 	const userId = getUserId(req);
-	if (!userId) return res.status(404).json({ message: 'No user ID found', type: 'error' });
+	if (!userId) return res.json({ message: 'No user ID found', type: 'error' });
 
 	try {
-		// tim user
-		let user = await User.findById(userId).populate([{ path: 'saved', select: '_id' }]);
-		// tim post
-		const post = await Post.findById(id);
+		const post = await Post.find({ _id: id, userSaved: userId });
+		if (post.length === 0)
+			return res.json({ message: 'You should save this post first', type: 'error' });
 
-		if (
-			user.saved.some((f) => f._id.toString() === id) &&
-			post.userSaved.some((f) => f === userId)
-		) {
-			await user.updateOne({
-				$set: {
-					saved: user.saved.filter((f) => f._id.toString() !== id),
+		const user = await User.findOneAndUpdate(
+			{ _id: userId },
+			{
+				$pull: { saved: id },
+			},
+			{ new: true }
+		)
+			.populate([
+				{
+					path: 'saved',
+					populate: { path: 'author', select: '_id username profilePicture' },
 				},
-			});
-			await post.updateOne({
-				$set: {
-					userSaved: post.userSaved.filter((f) => f !== userId),
-				},
-			});
+			])
+			.lean();
 
-			// lay lai user
-			user = await User.findById(userId)
-				.populate([
-					{
-						path: 'saved',
-						populate: { path: 'author', select: '_id username profilePicture' },
-					},
-				])
-				.lean();
+		await Post.findOneAndUpdate(
+			{ _id: id },
+			{
+				$push: { userSaved: userId },
+			},
+			{ new: true }
+		);
 
-			return res.status(200).json({ message: 'Unsave this post', type: 'success', user });
-		} else {
-			return res
-				.status(403)
-				.json({ message: 'You should save this post first', type: 'error' });
-		}
+		return res.status(200).json({ message: 'Unsave this post', type: 'success', user });
 	} catch (error) {
 		return res.status(500).json({ message: error.message, type: 'error' });
 	}
