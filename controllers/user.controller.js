@@ -46,7 +46,8 @@ exports.register = async (req, res) => {
 	try {
 		const existedUser = await User.findOne({ email });
 
-		if (existedUser) return res.json({ message: 'This email is already used', type: 'error' });
+		if (existedUser)
+			return res.status(400).json({ message: 'This email is already used', type: 'error' });
 
 		// Hash password
 		const hashedPassword = await handlePassword(password);
@@ -89,11 +90,12 @@ exports.login = async (req, res) => {
 				},
 			])
 			.lean();
-		if (!user) return res.json({ message: 'User is not found', type: 'error' });
+		if (!user) return res.status(404).json({ message: 'User is not found', type: 'error' });
 
 		// Check password
 		const validPassword = await bcrypt.compare(password, user.password);
-		if (!validPassword) return res.json({ message: 'Wrong Password!', type: 'error' });
+		if (!validPassword)
+			return res.status(400).json({ message: 'Wrong Password!', type: 'error' });
 
 		const token = sendToken(user);
 
@@ -115,7 +117,8 @@ exports.updateUser = async (req, res) => {
 
 	try {
 		const existedUser = await User.findOne({ email, _id: { $nin: [id] } }); // kiem tra trung email, ngoai tru user
-		if (existedUser) return res.json({ message: 'This email is already used', type: 'error' });
+		if (existedUser)
+			return res.status(400).json({ message: 'This email is already used', type: 'error' });
 
 		// Hash password
 		const hashedPassword = await handlePassword(password);
@@ -134,7 +137,7 @@ exports.updateUser = async (req, res) => {
 			{ new: true } // tra ve document da update
 		).lean();
 
-		if (!user) return res.json({ message: 'User not found.', type: 'error' });
+		if (!user) return res.status(404).json({ message: 'User is not found.', type: 'error' });
 
 		return res.status(200).json({
 			type: 'success',
@@ -209,7 +212,7 @@ exports.getUser = async (req, res) => {
 		if (user) {
 			return res.status(200).json(user);
 		} else {
-			return res.json({ message: 'User is not found', type: 'error' });
+			return res.status(404).json({ message: 'User is not found', type: 'error' });
 		}
 	} catch (error) {
 		return res.status(500).json({ message: error.message, type: 'error' });
@@ -220,12 +223,14 @@ exports.getUser = async (req, res) => {
 exports.follow = async (req, res) => {
 	const { friendId } = req.params;
 	const id = getUserId(req);
-	if (!friendId) return res.json({ message: 'No user ID found', type: 'error' });
+	if (!friendId) return res.status(404).json({ message: 'No user ID found', type: 'error' });
 
 	try {
 		const friend = await User.find({ _id: friendId, followers: id });
 		if (friend.length > 0)
-			return res.json({ message: 'You should unfollow this user first', type: 'error' });
+			return res
+				.status(400)
+				.json({ message: 'You should unfollow this user first', type: 'error' });
 
 		const user = await User.findOneAndUpdate(
 			{ _id: id },
@@ -255,12 +260,14 @@ exports.follow = async (req, res) => {
 exports.unfollow = async (req, res) => {
 	const { friendId } = req.params;
 	const id = getUserId(req);
-	if (!friendId) return res.json({ message: 'No ID found', type: 'error' });
+	if (!friendId) return res.status(404).json({ message: 'No ID found', type: 'error' });
 
 	try {
 		const friend = await User.find({ _id: friendId, followers: id });
 		if (friend.length === 0)
-			return res.json({ message: 'You should follow this user first', type: 'error' });
+			return res
+				.status(400)
+				.json({ message: 'You should follow this user first', type: 'error' });
 
 		const user = await User.findOneAndUpdate(
 			{ _id: id },

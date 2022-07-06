@@ -69,7 +69,7 @@ exports.getPost = async (req, res) => {
 		if (post) {
 			return res.status(200).json(post);
 		} else {
-			return res.json({ message: 'Post is not found', type: 'error' });
+			return res.status(404).json({ message: 'Post is not found', type: 'error' });
 		}
 	} catch (error) {
 		return res.status(500).json({ message: error.message, type: 'error' });
@@ -82,7 +82,7 @@ exports.createPost = async (req, res) => {
 	const authorId = getUserId(req);
 
 	if (text.length === 0 && file.length === 0)
-		return res.json({ message: 'Content is empty', type: 'error' });
+		return res.status(400).json({ message: 'Content is empty', type: 'error' });
 
 	try {
 		let newPost = new Post({ author: new mongoose.Types.ObjectId(authorId), text, file });
@@ -117,7 +117,7 @@ exports.updatePost = async (req, res) => {
 			if (post) {
 				return res.status(200).json(post);
 			} else {
-				return res.json({ message: 'Post is not found', type: 'error' });
+				return res.status(404).json({ message: 'Post is not found', type: 'error' });
 			}
 		} catch (error) {
 			return res.status(500).json({ message: error.message, type: 'error' });
@@ -137,7 +137,7 @@ exports.updatePost = async (req, res) => {
 			if (post) {
 				return res.status(200).json(post);
 			} else {
-				return res.json({ message: 'Post is not found', type: 'error' });
+				return res.status(404).json({ message: 'Post is not found', type: 'error' });
 			}
 		} catch (error) {
 			return res.status(500).json({ message: error.message, type: 'error' });
@@ -161,7 +161,7 @@ exports.updatePost = async (req, res) => {
 			if (post) {
 				return res.status(200).json(post);
 			} else {
-				return res.json({ message: 'Post is not found', type: 'error' });
+				return res.status(404).json({ message: 'Post is not found', type: 'error' });
 			}
 		} catch (error) {
 			return res.status(500).json({ message: error.message, type: 'error' });
@@ -184,7 +184,7 @@ exports.updatePost = async (req, res) => {
 			if (post) {
 				return res.status(200).json(post);
 			} else {
-				return res.json({ message: 'Post is not found', type: 'error' });
+				return res.status(404).json({ message: 'Post is not found', type: 'error' });
 			}
 		} catch (error) {
 			return res.status(500).json({ message: error.message, type: 'error' });
@@ -199,14 +199,15 @@ exports.updatePost = async (req, res) => {
 				const { comments } = post;
 				const theComment = comments.find((comment) => comment._id === req.body.commentId);
 
-				if (!theComment) return res.json({ message: 'Comment not found', type: 'error' });
+				if (!theComment)
+					return res.status(404).json({ message: 'Comment is not found', type: 'error' });
 				theComment.text = req.body.text;
 
 				await post.save();
 
 				return res.status(200).json(post.lean());
 			} else {
-				return res.json({ message: 'Post is not found', type: 'error' });
+				return res.status(404).json({ message: 'Post is not found', type: 'error' });
 			}
 		} catch (error) {
 			return res.status(500).json({ message: error.message, type: 'error' });
@@ -222,7 +223,7 @@ exports.updatePost = async (req, res) => {
 		if (post) {
 			return res.status(200).json(post);
 		} else {
-			return res.json({ message: 'Post is not found', type: 'error' });
+			return res.status(404).json({ message: 'Post is not found', type: 'error' });
 		}
 	} catch (error) {
 		return res.status(500).json({ message: error.message, type: 'error' });
@@ -269,13 +270,15 @@ exports.deletePost = async (req, res) => {
 exports.save = async (req, res) => {
 	const { id } = req.params;
 	const userId = getUserId(req);
-	if (!userId) return res.json({ message: 'No user ID found', type: 'error' });
+	if (!userId) return res.status(404).json({ message: 'No user ID found', type: 'error' });
 
 	try {
 		try {
 			const post = await Post.find({ _id: id, userSaved: userId });
 			if (post.length > 0)
-				return res.json({ message: 'You should unsave this post first', type: 'error' });
+				return res
+					.status(400)
+					.json({ message: 'You should unsave this post first', type: 'error' });
 
 			const user = await User.findOneAndUpdate(
 				{ _id: userId },
@@ -313,12 +316,14 @@ exports.save = async (req, res) => {
 exports.unsave = async (req, res) => {
 	const { id } = req.params;
 	const userId = getUserId(req);
-	if (!userId) return res.json({ message: 'No user ID found', type: 'error' });
+	if (!userId) return res.status(404).json({ message: 'No user ID found', type: 'error' });
 
 	try {
 		const post = await Post.find({ _id: id, userSaved: userId });
 		if (post.length === 0)
-			return res.json({ message: 'You should save this post first', type: 'error' });
+			return res
+				.status(400)
+				.json({ message: 'You should save this post first', type: 'error' });
 
 		const user = await User.findOneAndUpdate(
 			{ _id: userId },
