@@ -343,7 +343,7 @@ exports.unsave = async (req, res) => {
 		await Post.findOneAndUpdate(
 			{ _id: id },
 			{
-				$push: { userSaved: userId },
+				$pull: { userSaved: userId },
 			},
 			{ new: true }
 		);
