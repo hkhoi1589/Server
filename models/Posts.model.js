@@ -11,7 +11,6 @@ const Post = mongoose.model(
 					{
 						user: { type: Schema.ObjectId, ref: 'Users' },
 						text: String,
-						timestamp: Number,
 					},
 				],
 				default: [],

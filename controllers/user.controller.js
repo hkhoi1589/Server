@@ -155,26 +155,19 @@ exports.deleteUser = async (req, res) => {
 
 	try {
 		// find and update
-		let user = await User.findById(id).populate([
-			{ path: 'following', select: '_id followers' },
-			{ path: 'followers', select: '_id following' },
-		]);
+		let user = await User.findById(id);
 
 		// loai user khoi followers
-		user.followers.map(async ({ _id, following }) => {
+		user.followers.map(async (_id) => {
 			await User.findByIdAndUpdate(_id, {
-				$set: {
-					following: following.filter((f) => f._id.toString() !== id),
-				},
+				$pull: { following: id },
 			});
 		});
 
 		// loai user khoi following
-		user.following.map(async ({ _id, followers }) => {
+		user.following.map(async (_id) => {
 			await User.findByIdAndUpdate(_id, {
-				$set: {
-					followers: followers.filter((f) => f._id.toString() !== id),
-				},
+				$pull: { followers: id },
 			});
 		});
 
@@ -233,39 +226,28 @@ exports.follow = async (req, res) => {
 	if (!friendId) return res.status(404).json({ message: 'No ID found', type: 'error' });
 
 	try {
-		// tim user
-		let user = await User.findById(id).populate([{ path: 'following', select: '_id' }]);
-		const friend = await User.findById(friendId).populate([
-			{ path: 'followers', select: '_id' },
-		]);
+		const friend = await User.find({ _id: friendId, followers: id });
+		if (friend.length > 0) return res.status(500).json({ msg: 'You followed this user.' });
 
-		if (user.following.every((f) => f._id.toString() !== friendId)) {
-			await user.updateOne({
-				$push: {
-					following: {
-						_id: new mongoose.Types.ObjectId(friendId),
-					},
-				},
-			});
-			await friend.updateOne({
-				$push: {
-					followers: {
-						_id: new mongoose.Types.ObjectId(id),
-					},
-				},
-			});
+		const user = await User.findOneAndUpdate(
+			{ _id: id },
+			{
+				$push: { following: new mongoose.Types.ObjectId(friendId) },
+			},
+			{ new: true }
+		)
+			.populate([{ path: 'following', select: '_id username profilePicture' }])
+			.lean();
 
-			// lay lai user
-			user = await User.findById(id)
-				.populate([{ path: 'following', select: '_id username profilePicture' }])
-				.lean();
+		await User.findOneAndUpdate(
+			{ _id: friendId },
+			{
+				$push: { followers: new mongoose.Types.ObjectId(id) },
+			},
+			{ new: true }
+		);
 
-			return res.status(200).json({ message: 'Followed this user', type: 'success', user });
-		} else {
-			return res
-				.status(403)
-				.json({ message: 'You should unfollow this user first', type: 'error' });
-		}
+		return res.status(200).json({ message: 'Followed this user', type: 'success', user });
 	} catch (error) {
 		return res.status(500).json({ message: error.message, type: 'error' });
 	}
@@ -278,38 +260,28 @@ exports.unfollow = async (req, res) => {
 	if (!friendId) return res.status(404).json({ message: 'No ID found', type: 'error' });
 
 	try {
-		// tim user
-		let user = await User.findById(id).populate([{ path: 'following', select: '_id' }]);
-		const friend = await User.findById(friendId).populate([
-			{ path: 'followers', select: '_id' },
-		]);
+		const friend = await User.find({ _id: friendId, followers: id });
+		if (friend.length === 0) return res.status(500).json({ msg: 'You unfollowed this user.' });
 
-		if (user.following.some((f) => f._id.toString() === friendId)) {
-			await user.updateOne({
-				$set: {
-					following: user.following.filter((f) => f._id.toString() !== friendId),
-				},
-			});
+		const user = await User.findOneAndUpdate(
+			{ _id: id },
+			{
+				$pull: { following: friendId },
+			},
+			{ new: true }
+		)
+			.populate([{ path: 'following', select: '_id username profilePicture' }])
+			.lean();
 
-			await friend.updateOne({
-				$set: {
-					followers: friend.followers.filter((f) => f._id.toString() !== id),
-				},
-			});
+		await User.findOneAndUpdate(
+			{ _id: friendId },
+			{
+				$pull: { followers: id },
+			},
+			{ new: true }
+		);
 
-			// lay lai user
-			user = await User.findById(id)
-				.populate([{ path: 'following', select: '_id username profilePicture' }])
-				.lean();
-
-			return res
-				.status(200)
-				.json({ message: 'Unfollowed this friend', type: 'success', user });
-		} else {
-			return res
-				.status(403)
-				.json({ message: 'You should follow this user first', type: 'error' });
-		}
+		return res.status(200).json({ message: 'Unfollowed this user', type: 'success', user });
 	} catch (error) {
 		return res.status(500).json({ message: error.message, type: 'error' });
 	}

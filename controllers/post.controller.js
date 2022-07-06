@@ -106,68 +106,89 @@ exports.updatePost = async (req, res) => {
 
 	if (req.body.action === 'like') {
 		try {
-			return Post.findByIdAndUpdate(
+			const post = Post.findByIdAndUpdate(
 				id,
 				{
-					$inc: { likesCount: 1 },
-					$addToSet: { likers: req.body.id },
+					$push: { likers: req.body.userId },
 				},
-				{ new: true },
-				(err, post) => {
-					if (err) return res.status(400).send(err);
-					return res.send(post);
-				}
-			).populate([{ path: 'author' }, { path: 'comments' }]);
-		} catch (err) {
-			return res.status(400).json({ message: error.message, type: 'error' });
+				{ new: true }
+			).lean();
+
+			if (post) {
+				return res.status(200).json(post);
+			} else {
+				return res.status(404).json({ message: 'Post is not found', type: 'error' });
+			}
+		} catch (error) {
+			return res.status(500).json({ message: error.message, type: 'error' });
 		}
 	}
 
 	if (req.body.action === 'unlike') {
 		try {
-			return Post.findByIdAndUpdate(
+			const post = Post.findByIdAndUpdate(
 				id,
 				{
-					$inc: { likesCount: -1 },
-					$pull: { likers: req.body.id },
+					$pull: { likers: req.body.userId },
 				},
-				{ new: true },
-				(err, post) => {
-					if (err) return res.status(400).send(err);
-					return res.send(post);
-				}
-			);
-		} catch (err) {
-			return res.status(400).json({ message: error.message, type: 'error' });
+				{ new: true }
+			).lean();
+
+			if (post) {
+				return res.status(200).json(post);
+			} else {
+				return res.status(404).json({ message: 'Post is not found', type: 'error' });
+			}
+		} catch (error) {
+			return res.status(500).json({ message: error.message, type: 'error' });
 		}
 	}
 
 	if (req.body.action === 'addComment') {
 		try {
-			return Post.findByIdAndUpdate(
+			const post = Post.findByIdAndUpdate(
 				id,
 				{
 					$push: {
 						comments: {
-							commenterId: req.body.commenterId,
+							user: new mongoose.Types.ObjectId(req.body.commenterId),
 							text: req.body.text,
-							timestamp: new Date().getTime(),
 						},
 					},
 				},
-				{ new: true },
-				(err, post) => {
-					if (err) return res.status(400).send(err);
-					return res.send(post);
-				}
-			);
-		} catch (err) {
-			return res.status(400).json({ message: error.message, type: 'error' });
+				{ new: true }
+			).lean();
+			if (post) {
+				return res.status(200).json(post);
+			} else {
+				return res.status(404).json({ message: 'Post is not found', type: 'error' });
+			}
+		} catch (error) {
+			return res.status(500).json({ message: error.message, type: 'error' });
 		}
 	}
 
 	if (req.body.action === 'deleteComment') {
 		try {
+			const post = Post.findByIdAndUpdate(
+				id,
+				{
+					$set: {
+						comments: comments.filter((f) => f.user !== friendId),
+					},
+					$pull: {
+						comments: {
+							_id: req.body.commentId,
+						},
+					},
+				},
+				{ new: true }
+			).lean();
+			if (post) {
+				return res.status(200).json(post);
+			} else {
+				return res.status(404).json({ message: 'Post is not found', type: 'error' });
+			}
 			return Post.findByIdAndUpdate(
 				id,
 				{
@@ -183,8 +204,8 @@ exports.updatePost = async (req, res) => {
 					return res.send(post);
 				}
 			);
-		} catch (err) {
-			return res.status(400).json({ message: error.message, type: 'error' });
+		} catch (error) {
+			return res.status(500).json({ message: error.message, type: 'error' });
 		}
 	}
 
@@ -204,8 +225,8 @@ exports.updatePost = async (req, res) => {
 					return res.status(200).send(post);
 				});
 			});
-		} catch (err) {
-			return res.status(400).json({ message: error.message, type: 'error' });
+		} catch (error) {
+			return res.status(500).json({ message: error.message, type: 'error' });
 		}
 	}
 
@@ -219,8 +240,8 @@ exports.updatePost = async (req, res) => {
 				return res.send(post);
 			}
 		);
-	} catch (err) {
-		return res.status(400).json({ message: error.message, type: 'error' });
+	} catch (error) {
+		return res.status(500).json({ message: error.message, type: 'error' });
 	}
 };
 
