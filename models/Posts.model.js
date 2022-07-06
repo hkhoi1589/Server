@@ -27,8 +27,7 @@ const Post = mongoose.model(
 			},
 			file: {
 				type: String,
-				default:
-					'https://res.cloudinary.com/dlvk5v5jr/image/upload/v1656904678/noimage_food_viet247_r3nlzm.jpg',
+				default: '',
 			},
 			userSaved: {
 				type: [String],
