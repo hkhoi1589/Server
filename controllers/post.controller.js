@@ -149,7 +149,7 @@ exports.updatePost = async (req, res) => {
 
 	if (req.body.action === 'addComment') {
 		try {
-			const post = await Post.findByIdAndUpdate(
+			const cmt = await Post.findByIdAndUpdate(
 				id,
 				{
 					$push: {
@@ -161,17 +161,13 @@ exports.updatePost = async (req, res) => {
 				},
 				{ new: true }
 			)
-				.populate([
-					{
-						path: 'comments',
-						populate: { path: 'user', select: '_id username profilePicture' },
-					},
-				])
+				.select('comments')
+				.populate({ path: 'user', select: '_id username profilePicture' })
 				.lean();
-			if (post) {
-				return res.status(200).json(post);
+			if (cmt) {
+				return res.status(200).json(cmt);
 			} else {
-				return res.status(404).json({ message: 'Post is not found', type: 'error' });
+				return res.status(404).json({ message: 'Comment is not found', type: 'error' });
 			}
 		} catch (error) {
 			return res.status(500).json({ message: error.message, type: 'error' });
