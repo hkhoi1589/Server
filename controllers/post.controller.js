@@ -188,7 +188,7 @@ exports.updatePost = async (req, res) => {
 
 	if (req.body.action === 'deleteComment') {
 		try {
-			const cmt = await Post.findByIdAndUpdate(
+			await Post.findByIdAndUpdate(
 				id,
 				{
 					$pull: {
@@ -201,7 +201,9 @@ exports.updatePost = async (req, res) => {
 			).lean();
 
 			if (cmt) {
-				return res.status(200).json({ message: `Deleted comment`, type: 'success' });
+				return res
+					.status(200)
+					.json({ message: `Deleted comment`, type: 'success', cmt: { _id, commentId } });
 			} else {
 				return res.status(404).json({ message: 'Comment is not found', type: 'error' });
 			}
