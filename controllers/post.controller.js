@@ -188,21 +188,22 @@ exports.updatePost = async (req, res) => {
 
 	if (req.body.action === 'deleteComment') {
 		try {
-			const post = await Post.findByIdAndUpdate(
+			const cmt = await Post.findByIdAndUpdate(
 				id,
 				{
 					$pull: {
 						comments: {
-							_id: req.body.commentId,
+							user: req.body.user,
 						},
 					},
 				},
 				{ new: true }
 			).lean();
-			if (post) {
-				return res.status(200).json(post);
+
+			if (cmt) {
+				return res.status(200).json({ message: `Deleted comment`, type: 'success' });
 			} else {
-				return res.status(404).json({ message: 'Post is not found', type: 'error' });
+				return res.status(404).json({ message: 'Comment is not found', type: 'error' });
 			}
 		} catch (error) {
 			return res.status(500).json({ message: error.message, type: 'error' });
@@ -255,6 +256,8 @@ exports.deletePost = async (req, res) => {
 	try {
 		// loai post khoi nhung user da luu
 		const post = await Post.findById(id);
+		if (!post) return res.status(404).json({ message: 'Post is not found', type: 'error' });
+
 		if (post.userSaved.length > 0) {
 			post.userSaved.map(async (saveUser) => {
 				let userSaved = await User.findById(saveUser);
