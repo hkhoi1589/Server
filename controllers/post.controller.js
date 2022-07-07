@@ -215,20 +215,27 @@ exports.updatePost = async (req, res) => {
 	}
 
 	if (req.body.action === 'editComment') {
+		if (req.body.text.length === 0)
+			return res.status(400).json({ message: 'Comment is empty', type: 'error' });
+
 		try {
-			const post = await Post.findById(id);
+			const post = await Post.findById(id).select('comments').lean();
 
 			if (post) {
 				const { comments } = post;
-				const theComment = comments.find((comment) => comment._id === req.body.commentId);
+				const theComment = comments.find(
+					(comment) => comment._id.toString() === req.body.commentId
+				);
 
 				if (!theComment)
 					return res.status(404).json({ message: 'Comment is not found', type: 'error' });
 				theComment.text = req.body.text;
 
-				await post.save();
-
-				return res.status(200).json(post.lean());
+				return res.status(200).json({
+					message: `Updated comment`,
+					type: 'success',
+					post,
+				});
 			} else {
 				return res.status(404).json({ message: 'Post is not found', type: 'error' });
 			}
