@@ -62,7 +62,10 @@ exports.getPost = async (req, res) => {
 		const post = await Post.findById(id)
 			.populate([
 				{ path: 'author', select: '_id username profilePicture' },
-				{ path: 'comments', select: '_id username profilePicture' },
+				{
+					path: 'comments',
+					populate: { path: 'user', select: '_id username profilePicture' },
+				},
 				{ path: 'likers', select: '_id username profilePicture' },
 			])
 			.lean();
