@@ -157,7 +157,9 @@ exports.updatePost = async (req, res) => {
 					},
 				},
 				{ new: true }
-			).lean();
+			)
+				.populate([{ path: 'user', select: '_id username profilePicture' }])
+				.lean();
 			if (post) {
 				return res.status(200).json(post);
 			} else {
