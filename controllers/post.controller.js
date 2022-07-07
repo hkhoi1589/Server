@@ -16,7 +16,7 @@ exports.getAllPosts = async (req, res) => {
 
 		// cac post co author trong followings
 		const posts = await Post.find({ author: { $in: followings } })
-			.sort({ createdAt: 'desc' }) // sap xep desc
+			.sort({ createdAt: 'asc' }) // sap xep asc
 			.skip(perPage * page - perPage)
 			.limit(perPage)
 			.populate([
@@ -42,7 +42,7 @@ exports.getAllPostsByUser = async (req, res) => {
 	try {
 		// cac post co author trong followings
 		const posts = await Post.find({ author: new mongoose.Types.ObjectId(authorId) })
-			.sort({ createdAt: 'desc' }) // sap xep desc
+			.sort({ createdAt: 'asc' }) // sap xep asc
 			.skip(perPage * page - perPage)
 			.limit(perPage)
 			.populate([
