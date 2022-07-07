@@ -154,6 +154,8 @@ exports.updatePost = async (req, res) => {
 	}
 
 	if (req.body.action === 'addComment') {
+		if (req.body.text.length === 0)
+			return res.status(400).json({ message: 'Comment is empty', type: 'error' });
 		try {
 			const cmt = await Post.findByIdAndUpdate(id, {
 				$push: {
@@ -164,8 +166,12 @@ exports.updatePost = async (req, res) => {
 				},
 			})
 				.select('comments')
-				.populate({ path: 'user', select: '_id username profilePicture' })
+				.populate({
+					path: 'comments',
+					populate: { path: 'user', select: '_id username profilePicture' },
+				})
 				.lean();
+
 			if (cmt) {
 				return res.status(200).json(cmt);
 			} else {
