@@ -157,14 +157,18 @@ exports.updatePost = async (req, res) => {
 		if (req.body.text.length === 0)
 			return res.status(400).json({ message: 'Comment is empty', type: 'error' });
 		try {
-			const cmt = await Post.findByIdAndUpdate(id, {
-				$push: {
-					comments: {
-						user: new mongoose.Types.ObjectId(req.body.user),
-						text: req.body.text,
+			const cmt = await Post.findByIdAndUpdate(
+				id,
+				{
+					$push: {
+						comments: {
+							user: new mongoose.Types.ObjectId(req.body.user),
+							text: req.body.text,
+						},
 					},
 				},
-			})
+				{ new: true }
+			)
 				.select('comments')
 				.populate({
 					path: 'comments',
