@@ -258,20 +258,20 @@ exports.deletePost = async (req, res) => {
 	const { id } = req.params;
 	const userId = getUserId(req);
 	try {
-		// loai post khoi nhung user da luu
+		// tim post can xoa
 		const post = await Post.findById(id);
 		if (!post) return res.status(404).json({ message: 'Post is not found', type: 'error' });
 
+		// loai post khoi nhung user da luu, neu co
 		if (post.userSaved.length > 0) {
 			post.userSaved.map(async (saveUser) => {
-				let userSaved = await User.findById(saveUser);
-				if (userSaved.saved.some((f) => f._id.toString() === id)) {
-					await userSaved.updateOne({
-						$set: {
-							saved: userSaved.saved.filter((f) => f._id.toString() !== id),
+				await User.findByIdAndUpdate(saveUser, {
+					$pull: {
+						saved: {
+							_id: id,
 						},
-					});
-				}
+					},
+				});
 			});
 		}
 
@@ -279,12 +279,14 @@ exports.deletePost = async (req, res) => {
 		await Post.findByIdAndDelete(id);
 
 		// lay lai user hien tai
-		let user = await User.findById(userId).populate([
-			{
-				path: 'saved',
-				populate: { path: 'author', select: '_id username profilePicture' },
-			},
-		]);
+		let user = await User.findById(userId)
+			.populate([
+				{
+					path: 'saved',
+					populate: { path: 'author', select: '_id username profilePicture' },
+				},
+			])
+			.lean();
 		return res.status(200).json({ message: `Deleted post`, type: 'success', user });
 	} catch (error) {
 		return res.status(500).json({ message: error.message, type: 'error' });
