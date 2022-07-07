@@ -193,7 +193,7 @@ exports.updatePost = async (req, res) => {
 				{
 					$pull: {
 						comments: {
-							user: req.body.user,
+							_id: req.body.commentId,
 						},
 					},
 				},
