@@ -151,7 +151,7 @@ exports.updatePost = async (req, res) => {
 				{
 					$push: {
 						comments: {
-							user: new mongoose.Types.ObjectId(req.body.commenterId),
+							user: new mongoose.Types.ObjectId(req.body.user),
 							text: req.body.text,
 						},
 					},
