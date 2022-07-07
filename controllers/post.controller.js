@@ -149,18 +149,14 @@ exports.updatePost = async (req, res) => {
 
 	if (req.body.action === 'addComment') {
 		try {
-			const cmt = await Post.findByIdAndUpdate(
-				id,
-				{
-					$push: {
-						comments: {
-							user: new mongoose.Types.ObjectId(req.body.user),
-							text: req.body.text,
-						},
+			const cmt = await Post.findByIdAndUpdate(id, {
+				$push: {
+					comments: {
+						user: new mongoose.Types.ObjectId(req.body.user),
+						text: req.body.text,
 					},
 				},
-				{ new: true }
-			)
+			})
 				.select('comments')
 				.populate({ path: 'user', select: '_id username profilePicture' })
 				.lean();
