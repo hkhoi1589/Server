@@ -219,7 +219,13 @@ exports.updatePost = async (req, res) => {
 			return res.status(400).json({ message: 'Comment is empty', type: 'error' });
 
 		try {
-			const post = await Post.findById(id).select('comments').lean();
+			const post = await Post.findById(id)
+				.select('comments')
+				.populate({
+					path: 'comments',
+					populate: { path: 'user', select: '_id username profilePicture' },
+				})
+				.lean();
 
 			if (post) {
 				const { comments } = post;
