@@ -204,7 +204,7 @@ exports.updatePost = async (req, res) => {
 				return res.status(200).json({
 					message: `Deleted comment`,
 					type: 'success',
-					deletedCmt: { _id, commentId },
+					deletedCmt: { id, commentId },
 				});
 			} else {
 				return res.status(404).json({ message: 'Comment is not found', type: 'error' });
