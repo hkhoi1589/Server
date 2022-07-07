@@ -224,8 +224,7 @@ exports.updatePost = async (req, res) => {
 				.populate({
 					path: 'comments',
 					populate: { path: 'user', select: '_id username profilePicture' },
-				})
-				.lean();
+				});
 
 			if (post) {
 				const { comments } = post;
@@ -236,6 +235,8 @@ exports.updatePost = async (req, res) => {
 				if (!theComment)
 					return res.status(404).json({ message: 'Comment is not found', type: 'error' });
 				theComment.text = req.body.text;
+
+				await post.save();
 
 				return res.status(200).json({
 					message: `Updated comment`,
