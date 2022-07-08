@@ -302,8 +302,9 @@ exports.deletePost = async (req, res) => {
 		// xoa post
 		await Post.findByIdAndDelete(id);
 
-		// lay lai user hien tai
+		// lay lai saved cua user moi
 		let user = await User.findById(userId)
+			.select('saved')
 			.populate([
 				{
 					path: 'saved',
