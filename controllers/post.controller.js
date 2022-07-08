@@ -266,7 +266,7 @@ exports.updatePost = async (req, res) => {
 		if (post) {
 			return res.status(200).json({
 				type: 'success',
-				message: 'Update successfully',
+				message: 'Update post successfully',
 				post,
 			});
 		} else {
