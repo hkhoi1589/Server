@@ -258,7 +258,7 @@ exports.updatePost = async (req, res) => {
 	try {
 		const post = await Post.findByIdAndUpdate(
 			id,
-			{ $set: { text: req.body.text } },
+			{ $set: { text: req.body.text, file: req.body.file } },
 			{ new: true }
 		)
 			.select('text file')

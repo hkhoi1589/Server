@@ -127,12 +127,14 @@ exports.updateUser = async (req, res) => {
 		const user = await User.findByIdAndUpdate(
 			id,
 			{
-				username: username,
-				email: email,
-				password: hashedPassword,
-				coverPicture: coverPicture,
-				profilePicture: profilePicture,
-				desc: desc,
+				$set: {
+					username: username,
+					email: email,
+					password: hashedPassword,
+					coverPicture: coverPicture,
+					profilePicture: profilePicture,
+					desc: desc,
+				},
 			},
 			{ new: true } // tra ve document da update
 		).lean();
