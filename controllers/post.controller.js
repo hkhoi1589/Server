@@ -264,7 +264,11 @@ exports.updatePost = async (req, res) => {
 			.select('text file')
 			.lean();
 		if (post) {
-			return res.status(200).json(post);
+			return res.status(200).json({
+				type: 'success',
+				message: 'Update successfully',
+				post,
+			});
 		} else {
 			return res.status(404).json({ message: 'Post is not found', type: 'error' });
 		}
