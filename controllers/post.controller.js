@@ -121,7 +121,9 @@ exports.updatePost = async (req, res) => {
 					$push: { likers: req.body.userId },
 				},
 				{ new: true }
-			).lean();
+			)
+				.select('likers')
+				.lean();
 
 			if (post) {
 				return res.status(200).json(post);
@@ -141,7 +143,9 @@ exports.updatePost = async (req, res) => {
 					$pull: { likers: req.body.userId },
 				},
 				{ new: true }
-			).lean();
+			)
+				.select('likers')
+				.lean();
 
 			if (post) {
 				return res.status(200).json(post);
