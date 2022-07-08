@@ -28,6 +28,5 @@ app.use(morgan('common'));
 routes(app);
 
 app.listen(process.env.PORT || 8080, () => {
-	// Heroku dynamically assigns your app a port, so you can't set the port to a fixed number
 	console.log(`Backed server is ready http://localhost:${process.env.PORT || 8080}`);
 });

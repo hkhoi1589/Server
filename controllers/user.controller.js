@@ -221,6 +221,7 @@ exports.follow = async (req, res) => {
 			},
 			{ new: true }
 		)
+			.select('following')
 			.populate([{ path: 'following', select: '_id username profilePicture' }])
 			.lean();
 
@@ -252,6 +253,7 @@ exports.unfollow = async (req, res) => {
 			},
 			{ new: true }
 		)
+			.select('following')
 			.populate([{ path: 'following', select: '_id username profilePicture' }])
 			.lean();
 
