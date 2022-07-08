@@ -135,7 +135,7 @@ exports.updatePost = async (req, res) => {
 		}
 	}
 
-	if (req.body.action === 'unlike') {
+	if (req.body.action === 'dislike') {
 		try {
 			const post = await Post.findByIdAndUpdate(
 				id,
