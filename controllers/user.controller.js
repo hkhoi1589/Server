@@ -194,6 +194,10 @@ exports.getUser = async (req, res) => {
 			.populate([
 				{ path: 'following', select: '_id username profilePicture' },
 				{ path: 'followers', select: '_id username profilePicture' },
+				{
+					path: 'saved',
+					populate: { path: 'author', select: '_id username profilePicture' },
+				},
 			])
 			.lean();
 
