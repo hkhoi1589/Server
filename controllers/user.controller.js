@@ -15,6 +15,7 @@ exports.getFriend = async (req, res) => {
 		} else {
 			const rand = Math.floor(Math.random() * count); // tinh random
 			users = await User.find({ _id: { $nin: excludeList } }) // tim cac record khong co id trong excludeList
+				.select('profilePicture username followers')
 				.skip(rand)
 				.limit(9) // skip so luong record random va lay 9 record
 				.lean();
@@ -32,7 +33,9 @@ exports.searchFriend = async (req, res) => {
 		const users = await User.find({
 			_id: { $nin: excludeList },
 			username: { $regex: username, $options: 'i' },
-		}).lean();
+		})
+			.select('profilePicture username followers')
+			.lean();
 		return res.status(200).json(users);
 	} catch (error) {
 		return res.status(500).json({ message: error.message, type: 'error' });
@@ -143,7 +146,7 @@ exports.updateUser = async (req, res) => {
 
 		return res.status(200).json({
 			type: 'success',
-			message: 'Update successfully',
+			message: 'Updated successfully',
 			user,
 		});
 	} catch (error) {
