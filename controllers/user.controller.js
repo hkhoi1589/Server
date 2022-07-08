@@ -214,12 +214,6 @@ exports.follow = async (req, res) => {
 	if (!friendId) return res.status(404).json({ message: 'No user ID found', type: 'error' });
 
 	try {
-		const friend = await User.find({ _id: friendId, followers: id });
-		if (friend.length > 0)
-			return res
-				.status(400)
-				.json({ message: 'You should unfollow this user first', type: 'error' });
-
 		const user = await User.findOneAndUpdate(
 			{ _id: id },
 			{
@@ -251,12 +245,6 @@ exports.unfollow = async (req, res) => {
 	if (!friendId) return res.status(404).json({ message: 'No ID found', type: 'error' });
 
 	try {
-		const friend = await User.find({ _id: friendId, followers: id });
-		if (friend.length === 0)
-			return res
-				.status(400)
-				.json({ message: 'You should follow this user first', type: 'error' });
-
 		const user = await User.findOneAndUpdate(
 			{ _id: id },
 			{
