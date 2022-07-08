@@ -260,7 +260,9 @@ exports.updatePost = async (req, res) => {
 			id,
 			{ $set: { text: req.body.text } },
 			{ new: true }
-		).lean();
+		)
+			.select('text file')
+			.lean();
 		if (post) {
 			return res.status(200).json(post);
 		} else {
