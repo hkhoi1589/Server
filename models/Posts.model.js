@@ -17,6 +17,7 @@ const Post = mongoose.model(
 			},
 			likers: {
 				type: [{ type: Schema.ObjectId, ref: 'Users' }],
+				unique: true,
 				default: [],
 			},
 			text: {
@@ -30,6 +31,7 @@ const Post = mongoose.model(
 			},
 			userSaved: {
 				type: [String],
+				unique: true,
 				default: [],
 			},
 		},
