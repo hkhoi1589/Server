@@ -12,7 +12,11 @@ const morgan = require('morgan'); //HTTP request logger
 const routes = require('./routes');
 
 const app = express();
-app.use(cors());
+app.use(
+	cors({
+		origin: '*',
+	})
+);
 
 //connect mongodb
 db.connect();
