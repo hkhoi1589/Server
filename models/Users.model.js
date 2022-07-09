@@ -43,6 +43,18 @@ const User = mongoose.model(
 				type: [{ type: Schema.ObjectId, ref: 'Users' }],
 				default: [],
 			},
+			noti: {
+				type: [
+					{
+						client: { type: Schema.ObjectId, ref: 'Users' },
+						text: String,
+						url: String,
+						isRead: Boolean,
+					},
+					{ timestamps: true },
+				],
+				default: [],
+			},
 			saved: {
 				type: [{ type: Schema.ObjectId, ref: 'Posts' }],
 				default: [],

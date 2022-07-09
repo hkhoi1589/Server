@@ -20,10 +20,10 @@ exports.getAllPosts = async (req, res) => {
 			.skip(perPage * page - perPage)
 			.limit(perPage)
 			.populate([
-				{ path: 'author', select: '_id username profilePicture' },
+				{ path: 'author', select: 'username profilePicture' },
 				{
 					path: 'comments',
-					populate: { path: 'user', select: '_id username profilePicture' },
+					populate: { path: 'user', select: 'username profilePicture' },
 				},
 			])
 			.lean();
@@ -45,10 +45,10 @@ exports.getAllPostsByUser = async (req, res) => {
 			.skip(perPage * page - perPage)
 			.limit(perPage)
 			.populate([
-				{ path: 'author', select: '_id username profilePicture' },
+				{ path: 'author', select: 'username profilePicture' },
 				{
 					path: 'comments',
-					populate: { path: 'user', select: '_id username profilePicture' },
+					populate: { path: 'user', select: 'username profilePicture' },
 				},
 			])
 			.lean();
@@ -65,10 +65,10 @@ exports.getPost = async (req, res) => {
 	try {
 		const post = await Post.findById(id)
 			.populate([
-				{ path: 'author', select: '_id username profilePicture' },
+				{ path: 'author', select: 'username profilePicture' },
 				{
 					path: 'comments',
-					populate: { path: 'user', select: '_id username profilePicture' },
+					populate: { path: 'user', select: 'username profilePicture' },
 				},
 			])
 			.lean();
@@ -93,9 +93,7 @@ exports.createPost = async (req, res) => {
 	try {
 		let newPost = new Post({ author: new mongoose.Types.ObjectId(authorId), text, file });
 		await newPost.save();
-		newPost = await newPost.populate([
-			{ path: 'author', select: '_id username profilePicture' },
-		]);
+		newPost = await newPost.populate([{ path: 'author', select: 'username profilePicture' }]);
 		return res.status(200).json({
 			message: 'Create successfully',
 			type: 'success',
@@ -173,7 +171,7 @@ exports.updatePost = async (req, res) => {
 				.select('comments')
 				.populate({
 					path: 'comments',
-					populate: { path: 'user', select: '_id username profilePicture' },
+					populate: { path: 'user', select: 'username profilePicture' },
 				})
 				.lean();
 
@@ -305,7 +303,7 @@ exports.deletePost = async (req, res) => {
 			.populate([
 				{
 					path: 'saved',
-					populate: { path: 'author', select: '_id username profilePicture' },
+					populate: { path: 'author', select: 'username profilePicture' },
 				},
 			])
 			.lean();
@@ -339,7 +337,7 @@ exports.save = async (req, res) => {
 				.populate([
 					{
 						path: 'saved',
-						populate: { path: 'author', select: '_id username profilePicture' },
+						populate: { path: 'author', select: 'username profilePicture' },
 					},
 				])
 				.lean();
@@ -384,7 +382,7 @@ exports.unsave = async (req, res) => {
 			.populate([
 				{
 					path: 'saved',
-					populate: { path: 'author', select: '_id username profilePicture' },
+					populate: { path: 'author', select: 'username profilePicture' },
 				},
 			])
 			.lean();
