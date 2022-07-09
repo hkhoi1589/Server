@@ -90,7 +90,7 @@ const SocketServer = (socket) => {
 	// Notification
 	socket.on('createNotify', (msg) => {
 		const client = users.find((user) => user.id === msg.clientId);
-		client && socket.to(`${client.socketId}`).emit('createNotifyToClient', msg.text); // gui lai client bi follow
+		client && socket.to(`${client.socketId}`).emit('createNotifyToClient', msg); // gui lai client bi follow
 	});
 
 	socket.on('removeNotify', (msg) => {
