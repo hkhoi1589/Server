@@ -2,6 +2,7 @@
 const express = require('express');
 const db = require('./models');
 const dotenv = require('dotenv');
+const SocketServer = require('./socketServer');
 dotenv.config();
 
 // middleware
@@ -9,6 +10,10 @@ const cors = require('cors');
 const helmet = require('helmet'); //secure your Express apps by setting various HTTP headers
 const morgan = require('morgan'); //HTTP request logger
 const routes = require('./routes');
+
+// Socket
+const http = require('http').createServer(app);
+const io = require('socket.io')(http);
 
 const app = express();
 app.use(cors());
@@ -23,6 +28,11 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(helmet());
 app.use(morgan('common'));
+
+//socket
+io.on('connection', (socket) => {
+	SocketServer(socket);
+});
 
 // Route
 routes(app);
