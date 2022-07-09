@@ -2,7 +2,6 @@ const User = require('../models').users;
 const mongoose = require('mongoose');
 const bcrypt = require('bcrypt');
 const { handlePassword, sendToken, getUserId } = require('../helpers');
-const SocketServer = require('../socketServer');
 
 // Get random friend
 exports.getFriend = async (req, res) => {
@@ -138,7 +137,10 @@ exports.updateUser = async (req, res) => {
 				{ new: true }
 			)
 				.select('noti')
-				.populate({ path: 'noti', select: 'username profilePicture' })
+				.populate({
+					path: 'noti',
+					populate: { path: 'client', select: 'username profilePicture' },
+				})
 				.lean();
 
 			if (noti) {
@@ -187,7 +189,7 @@ exports.updateUser = async (req, res) => {
 	}
 };
 
-// delete user
+// delete user(chua xong)
 exports.deleteUser = async (req, res) => {
 	const id = getUserId(req);
 
