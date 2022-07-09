@@ -27,11 +27,7 @@ app.use(morgan('common'));
 
 // Socket
 const http = require('http').createServer(app);
-const io = require('socket.io')(http, {
-	cors: {
-		origin: 'http://localhost:3000',
-	},
-});
+const io = require('socket.io')(http);
 io.on('connection', (socket) => {
 	SocketServer(socket);
 });
