@@ -25,7 +25,6 @@ exports.getAllPosts = async (req, res) => {
 					path: 'comments',
 					populate: { path: 'user', select: '_id username profilePicture' },
 				},
-				{ path: 'likers', select: '_id username profilePicture' },
 			])
 			.lean();
 		return res.status(200).json(posts);
@@ -51,7 +50,6 @@ exports.getAllPostsByUser = async (req, res) => {
 					path: 'comments',
 					populate: { path: 'user', select: '_id username profilePicture' },
 				},
-				{ path: 'likers', select: '_id username profilePicture' },
 			])
 			.lean();
 		return res.status(200).json(posts);
@@ -72,7 +70,6 @@ exports.getPost = async (req, res) => {
 					path: 'comments',
 					populate: { path: 'user', select: '_id username profilePicture' },
 				},
-				{ path: 'likers', select: '_id username profilePicture' },
 			])
 			.lean();
 		if (post) {
