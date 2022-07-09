@@ -12,7 +12,11 @@ const morgan = require('morgan'); //HTTP request logger
 const routes = require('./routes');
 
 const app = express();
-app.use(cors());
+app.use(
+	cors({
+		origin: '*',
+	})
+);
 
 //connect mongodb
 db.connect();
@@ -27,11 +31,7 @@ app.use(morgan('common'));
 
 // Socket
 const http = require('http').createServer(app);
-const io = require('socket.io')(http, {
-	cors: {
-		origin: '*',
-	},
-});
+const io = require('socket.io')(http);
 io.on('connection', (socket) => {
 	SocketServer(socket);
 });
