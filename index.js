@@ -8,37 +8,38 @@ dotenv.config();
 // middleware
 const cors = require('cors');
 const helmet = require('helmet'); //secure your Express apps by setting various HTTP headers
-const morgan = require('morgan'); //HTTP request logger
 const routes = require('./routes');
 
 const app = express();
-app.use(
-	cors({
-		origin: '*',
-	})
-);
+app.use(cors());
 
 //connect mongodb
 db.connect();
 
-//middleware sẽ đóng vai trò trung gian giữa request/response và các tiền xử lý logic.
 // parse requests of content-type - application/json
 app.use(express.json());
 // parse requests of content-type - application/x-www-form-urlencoded
 app.use(express.urlencoded({ extended: true }));
 app.use(helmet());
-app.use(morgan('common'));
 
 // Socket
-const http = require('http').createServer(app);
-const io = require('socket.io')(http);
-io.on('connection', (socket) => {
-	SocketServer(socket);
+const http = require('http');
+const server = http.createServer(app); // http server
+const { Server } = require('socket.io');
+const io = new Server(server, {
+	cors: {
+		origin: 'http://localhost:3000', // domain cua client
+	},
 });
 
 // Route
 routes(app);
 
-app.listen(process.env.PORT || 8080, () => {
+// socket io
+io.on('connection', (socket) => {
+	SocketServer(socket);
+});
+
+server.listen(process.env.PORT || 8080, () => {
 	console.log(`Backed server is ready http://localhost:${process.env.PORT || 8080}`);
 });
