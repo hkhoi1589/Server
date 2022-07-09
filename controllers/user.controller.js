@@ -127,7 +127,8 @@ exports.updateUser = async (req, res) => {
 				{
 					$push: {
 						noti: {
-							client: new mongoose.Types.ObjectId(req.body.clientId),
+							client: req.body.clientId,
+							user: req.body.user,
 							text: req.body.text,
 							url: req.body.url,
 							isRead: false,
@@ -137,10 +138,6 @@ exports.updateUser = async (req, res) => {
 				{ new: true }
 			)
 				.select('noti')
-				.populate({
-					path: 'noti',
-					populate: { path: 'client', select: 'username profilePicture' },
-				})
 				.lean();
 
 			if (noti) {
