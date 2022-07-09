@@ -88,7 +88,6 @@ exports.login = async (req, res) => {
 			.populate([
 				{ path: 'following', select: 'username profilePicture' },
 				{ path: 'followers', select: 'username profilePicture' },
-				{ path: 'noti', select: 'username profilePicture' },
 				{
 					path: 'saved',
 					populate: { path: 'author', select: 'username profilePicture' },
@@ -188,7 +187,7 @@ exports.updateUser = async (req, res) => {
 	}
 };
 
-// delete user (chua xong)
+// delete user
 exports.deleteUser = async (req, res) => {
 	const id = getUserId(req);
 
@@ -219,37 +218,27 @@ exports.deleteUser = async (req, res) => {
 	}
 };
 
-// Create noti
-exports.register = async (req, res) => {
-	const { username, email, password } = req.body;
+// Get user by id
+exports.getUser = async (req, res) => {
+	const { id } = req.params;
 
 	try {
-		const existedUser = await User.findOne({ email });
+		let user = await User.findById(id)
+			.populate([
+				{ path: 'following', select: 'username profilePicture' },
+				{ path: 'followers', select: 'username profilePicture' },
+				{
+					path: 'saved',
+					populate: { path: 'author', select: 'username profilePicture' },
+				},
+			])
+			.lean();
 
-		if (existedUser)
-			return res.status(400).json({ message: 'This email is already used', type: 'error' });
-
-		// Hash password
-		const hashedPassword = await handlePassword(password);
-
-		// Create new user
-		const user = new User({
-			username: username,
-			email: email,
-			password: hashedPassword,
-		});
-
-		// Save to DB
-		await user.save();
-
-		const token = sendToken(user);
-
-		return res.status(200).json({
-			message: 'Register successfully',
-			type: 'success',
-			token,
-			user,
-		});
+		if (user) {
+			return res.status(200).json(user);
+		} else {
+			return res.status(404).json({ message: 'User is not found', type: 'error' });
+		}
 	} catch (error) {
 		return res.status(500).json({ message: error.message, type: 'error' });
 	}
@@ -302,7 +291,7 @@ exports.unfollow = async (req, res) => {
 			{ new: true }
 		)
 			.select('username profilePicture following')
-			.populate([{ path: 'following', select: '_id username profilePicture' }])
+			.populate([{ path: 'following', select: 'username profilePicture' }])
 			.lean();
 
 		await User.findOneAndUpdate(
