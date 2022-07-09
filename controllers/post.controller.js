@@ -222,7 +222,7 @@ exports.updatePost = async (req, res) => {
 				.select('comments')
 				.populate({
 					path: 'comments',
-					populate: { path: 'user', select: '_id username profilePicture' },
+					populate: { path: 'user', select: 'username profilePicture' },
 				});
 
 			if (post) {

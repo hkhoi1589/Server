@@ -46,8 +46,7 @@ const User = mongoose.model(
 			noti: {
 				type: [
 					{
-						client: String,
-						user: String,
+						user: { type: Schema.ObjectId, ref: 'Users' },
 						text: String,
 						url: String,
 						isRead: Boolean,
