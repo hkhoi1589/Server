@@ -8,7 +8,6 @@ const EditData = (data, id, call) => {
 const SocketServer = (socket) => {
 	// Connect - Disconnect
 	socket.on('joinUser', (user) => {
-		console.log(user);
 		users.push({
 			id: user._id,
 			socketId: socket.id,
@@ -65,7 +64,6 @@ const SocketServer = (socket) => {
 
 	// Notification
 	socket.on('createNotify', (msg) => {
-		console.log(msg);
 		const client = users.find((user) => user.id === msg.clientId);
 		client && socket.to(`${client.socketId}`).emit('createNotifyToClient', msg); // gui lai client bi follow
 	});
