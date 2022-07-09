@@ -11,10 +11,6 @@ const helmet = require('helmet'); //secure your Express apps by setting various 
 const morgan = require('morgan'); //HTTP request logger
 const routes = require('./routes');
 
-// Socket
-const http = require('http').createServer(app);
-const io = require('socket.io')(http);
-
 const app = express();
 app.use(cors());
 
@@ -29,7 +25,9 @@ app.use(express.urlencoded({ extended: true }));
 app.use(helmet());
 app.use(morgan('common'));
 
-//socket
+// Socket
+const http = require('http').createServer(app);
+const io = require('socket.io')(http);
 io.on('connection', (socket) => {
 	SocketServer(socket);
 });

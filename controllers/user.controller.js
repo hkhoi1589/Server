@@ -2,6 +2,7 @@ const User = require('../models').users;
 const mongoose = require('mongoose');
 const bcrypt = require('bcrypt');
 const { handlePassword, sendToken, getUserId } = require('../helpers');
+const SocketServer = require('../socketServer');
 
 // Get random friend
 exports.getFriend = async (req, res) => {
@@ -85,11 +86,11 @@ exports.login = async (req, res) => {
 		// Find user
 		const user = await User.findOne({ email })
 			.populate([
-				{ path: 'following', select: '_id username profilePicture' },
-				{ path: 'followers', select: '_id username profilePicture' },
+				{ path: 'following', select: 'username profilePicture' },
+				{ path: 'followers', select: 'username profilePicture' },
 				{
 					path: 'saved',
-					populate: { path: 'author', select: '_id username profilePicture' },
+					populate: { path: 'author', select: 'username profilePicture' },
 				},
 			])
 			.lean();
@@ -192,11 +193,11 @@ exports.getUser = async (req, res) => {
 	try {
 		let user = await User.findById(id)
 			.populate([
-				{ path: 'following', select: '_id username profilePicture' },
-				{ path: 'followers', select: '_id username profilePicture' },
+				{ path: 'following', select: 'username profilePicture' },
+				{ path: 'followers', select: 'username profilePicture' },
 				{
 					path: 'saved',
-					populate: { path: 'author', select: '_id username profilePicture' },
+					populate: { path: 'author', select: 'username profilePicture' },
 				},
 			])
 			.lean();
@@ -225,8 +226,8 @@ exports.follow = async (req, res) => {
 			},
 			{ new: true }
 		)
-			.select('following')
-			.populate([{ path: 'following', select: '_id username profilePicture' }])
+			.select('username profilePicture following')
+			.populate([{ path: 'following', select: 'username profilePicture' }])
 			.lean();
 
 		await User.findOneAndUpdate(
@@ -257,7 +258,7 @@ exports.unfollow = async (req, res) => {
 			},
 			{ new: true }
 		)
-			.select('following')
+			.select('username profilePicture following')
 			.populate([{ path: 'following', select: '_id username profilePicture' }])
 			.lean();
 
