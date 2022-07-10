@@ -37,7 +37,7 @@ routes(app);
 
 // socket io
 io.on('connection', (socket) => {
-	SocketServer(socket);
+	SocketServer(socket, io);
 });
 
 server.listen(process.env.PORT || 8080, () => {

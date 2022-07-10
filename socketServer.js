@@ -3,17 +3,15 @@ const mongoose = require('mongoose');
 
 let users = [];
 
-const SocketServer = (socket) => {
+const SocketServer = (socket, io) => {
 	// Connect - Disconnect
 	socket.on('joinUser', (user) => {
-		console.log('Hi');
 		users.push({
 			id: user._id,
-			socketId: socket.id,
+			socketId: io.id,
 			following: user.following,
 			followers: user.followers,
 		});
-		console.log(users);
 	});
 
 	// Likes
@@ -83,6 +81,7 @@ const SocketServer = (socket) => {
 
 	// Check User Online / Offline
 	socket.on('checkUserOnline', (data) => {
+		console.log(users);
 		// user is online in follwing
 		const following = users.filter((user) =>
 			data.following.find((item) => item._id === user.id)
