@@ -2,11 +2,6 @@ const User = require('./models/Users.model');
 
 let users = [];
 
-const EditData = (data, id, call) => {
-	const newData = data.map((item) => (item.id === id ? { ...item, call } : item));
-	return newData;
-};
-
 const SocketServer = (socket) => {
 	// Connect - Disconnect
 	socket.on('joinUser', (user) => {
@@ -68,25 +63,19 @@ const SocketServer = (socket) => {
 	socket.on('createNotify', async (msg) => {
 		const client = users.find((user) => user.id === msg.clientId);
 		if (!client) {
-			// client offline
+			// neu client offline
 			// luu truoc vao db
-			await User.findByIdAndUpdate(id, {
+			await User.findByIdAndUpdate(msg.clientId, {
 				$push: {
 					noti: {
-						user: new mongoose.Types.ObjectId(req.body.userId),
-						text: req.body.text,
-						url: req.body.url,
+						user: new mongoose.Types.ObjectId(msg.userId),
+						text: msg.text,
+						url: msg.url,
 						isRead: false,
 					},
 				},
 			});
-		}
-		client && socket.to(`${client.socketId}`).emit('createNotifyToClient', msg);
-	});
-
-	socket.on('removeNotify', (msg) => {
-		const client = users.find((user) => msg.recipients.includes(user.id));
-		client && socket.to(`${client.socketId}`).emit('removeNotifyToClient', msg);
+		} else client && socket.to(`${client.socketId}`).emit('createNotifyToClient', msg);
 	});
 
 	// Check User Online / Offline
