@@ -16,8 +16,8 @@ const SocketServer = (socket) => {
 				followers: user.followers,
 			},
 		];
+		console.log(users);
 	});
-	console.log(users);
 
 	// Likes
 	socket.on('likePost', (newPost) => {
