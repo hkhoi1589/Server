@@ -108,6 +108,7 @@ const SocketServer = (socket, io) => {
 	socket.on('disconnect', () => {
 		const data = users.filter((user) => user.socketId === socket.id);
 		if (data) {
+			console.log(data);
 			const clients = users.filter((user) =>
 				data.followers.some((item) => item._id === user.id)
 			);
