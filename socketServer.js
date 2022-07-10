@@ -84,11 +84,11 @@ const SocketServer = (socket, io) => {
 	socket.on('checkUserOnline', (data) => {
 		console.log(users);
 		// user is online in follwing
-		const following = users.filter((user) =>
-			data.following.find((item) => item._id === user.id)
+		const followingOnline = users.filter((user) =>
+			data.following.some((item) => item._id === user.id)
 		);
-		console.log('Following:', following);
-		//socket.emit('checkUserOnlineToMe', following);
+		console.log('Following:', followingOnline);
+		//socket.emit('checkUserOnlineToMe', followingOnline);
 	});
 
 	socket.on('disconnect', () => {
