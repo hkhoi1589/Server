@@ -217,7 +217,7 @@ exports.deleteUser = async (req, res) => {
 		});
 
 		//xoa post cua user
-		await Post.findOneAndDelete({ author: _id });
+		await Post.findOneAndDelete({ author: id });
 
 		// xoa user
 		await User.findByIdAndDelete(id);
