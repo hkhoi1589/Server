@@ -217,7 +217,7 @@ exports.deleteUser = async (req, res) => {
 		});
 
 		//xoa post cua user
-		await Post.findOneAndDelete({ author: id });
+		await Post.findOneAndDelete({ author: new mongoose.Types.ObjectId(id) });
 
 		// xoa user
 		await User.findByIdAndDelete(id);
