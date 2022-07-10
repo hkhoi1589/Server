@@ -1,4 +1,4 @@
-const User = require("./models/Users.model");
+const User = require('./models/Users.model');
 
 let users = [];
 
@@ -65,23 +65,21 @@ const SocketServer = (socket) => {
 	});
 
 	// Notification
-	socket.on('createNotify', (msg) => {
+	socket.on('createNotify', async (msg) => {
 		const client = users.find((user) => user.id === msg.clientId);
-		if(!client){// client offline
+		if (!client) {
+			// client offline
 			// luu truoc vao db
-			await User.findByIdAndUpdate(
-				id,
-				{
-					$push: {
-						noti: {
-							user: new mongoose.Types.ObjectId(req.body.userId),
-							text: req.body.text,
-							url: req.body.url,
-							isRead: false,
-						},
+			await User.findByIdAndUpdate(id, {
+				$push: {
+					noti: {
+						user: new mongoose.Types.ObjectId(req.body.userId),
+						text: req.body.text,
+						url: req.body.url,
+						isRead: false,
 					},
 				},
-			)
+			});
 		}
 		client && socket.to(`${client.socketId}`).emit('createNotifyToClient', msg);
 	});
