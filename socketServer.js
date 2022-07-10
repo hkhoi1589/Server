@@ -6,12 +6,16 @@ let users = [];
 const SocketServer = (socket) => {
 	// Connect - Disconnect
 	socket.on('joinUser', (user) => {
-		users.push({
-			id: user._id,
-			socketId: socket.id,
-			following: user.following,
-			followers: user.followers,
-		});
+		console.log('Hi');
+		users = [
+			...users,
+			{
+				id: user._id,
+				socketId: socket.id,
+				following: user.following,
+				followers: user.followers,
+			},
+		];
 	});
 	console.log(users);
 
@@ -82,12 +86,12 @@ const SocketServer = (socket) => {
 
 	// Check User Online / Offline
 	socket.on('checkUserOnline', (data) => {
-		// for user
+		// user is online in follwing
 		const following = users.filter((user) =>
 			data.following.find((item) => item._id === user.id)
 		);
 		console.log('Following:', following);
-		socket.emit('checkUserOnlineToMe', following);
+		//socket.emit('checkUserOnlineToMe', following);
 	});
 
 	socket.on('disconnect', () => {
