@@ -229,25 +229,52 @@ exports.getUser = async (req, res) => {
 	const { id } = req.params;
 
 	try {
-		let user = await User.findById(id)
-			.populate([
-				{ path: 'following', select: 'username profilePicture' },
-				{ path: 'followers', select: 'username profilePicture' },
-				{
-					path: 'noti',
-					populate: { path: 'user', select: 'username profilePicture' },
-				},
-				{
-					path: 'saved',
-					populate: { path: 'author', select: 'username profilePicture' },
-				},
-			])
-			.lean();
+		if (req.body.action === 'authUser') {
+			let user = await User.findById(id)
+				.populate([
+					{ path: 'following', select: 'username profilePicture' },
+					{ path: 'followers', select: 'username profilePicture' },
+					{
+						path: 'noti',
+						populate: { path: 'user', select: 'username profilePicture' },
+					},
+					{
+						path: 'saved',
+						populate: { path: 'author', select: 'username profilePicture' },
+					},
+				])
+				.lean();
 
-		if (user) {
-			return res.status(200).json(user);
-		} else {
-			return res.status(404).json({ message: 'User is not found', type: 'error' });
+			if (user) {
+				return res.status(200).json(user);
+			} else {
+				return res.status(404).json({ message: 'User is not found', type: 'error' });
+			}
+		}
+
+		if (req.body.action === 'user') {
+			let user = await User.findById(id)
+				.populate([
+					{ path: 'following', select: 'username profilePicture' },
+					{ path: 'followers', select: 'username profilePicture' },
+				])
+				.lean();
+
+			if (user) {
+				return res.status(200).json(user);
+			} else {
+				return res.status(404).json({ message: 'User is not found', type: 'error' });
+			}
+		}
+
+		if (req.body.action === 'onlineUser') {
+			let user = await User.findById(id).select('username profilePicture').lean();
+
+			if (user) {
+				return res.status(200).json(user);
+			} else {
+				return res.status(404).json({ message: 'User is not found', type: 'error' });
+			}
 		}
 	} catch (error) {
 		return res.status(500).json({ message: error.message, type: 'error' });

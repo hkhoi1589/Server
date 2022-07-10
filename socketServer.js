@@ -80,17 +80,26 @@ const SocketServer = (socket, io) => {
 		} else socket.to(`${client.socketId}`).emit('createNotifyToClient', msg);
 	});
 
-	// Check User Online / Offline
+	// Online/Offline
 	socket.on('checkUserOnline', (data) => {
-		// user is online in follwing
-		const followersOnline = users.filter((user) =>
-			data.followers.some((item) => item._id === user.id)
+		// tim following dang online
+		const following = users.filter((user) =>
+			data.following.find((item) => item._id === user.id)
 		);
-		const msg = { _id: data._id, username: data.username, profilePicture: data.profilePicture };
-		followersOnline.map((followers) =>
-			socket.to(`${followers.socketId}`).emit('checkUserOnlineToMe', msg)
-		);
-		//gui cho followers
+		// tra ve cho user
+		socket.emit('checkUserOnlineToMe', following);
+
+		const clients = users.filter((user) => data.followers.find((item) => item._id === user.id));
+		if (clients.length > 0) {
+			let msg = {
+				_id: data._id,
+				username: data.username,
+				profilePicture: data.profilePicture,
+			};
+			clients.forEach((client) => {
+				socket.to(`${client.socketId}`).emit('checkUserOnlineToClient', msg);
+			});
+		}
 	});
 
 	socket.on('disconnect', () => {

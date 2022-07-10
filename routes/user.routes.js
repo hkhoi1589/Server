@@ -10,7 +10,7 @@ router.put('/follow/:friendId', userCtrl.follow);
 // Unfollow a user
 router.put('/unfollow/:friendId', userCtrl.unfollow);
 // Get user by id
-router.get('/:id', userCtrl.getUser);
+router.post('/:id', userCtrl.getUser);
 // Update user
 router.put('/', userCtrl.updateUser);
 // Delete user
