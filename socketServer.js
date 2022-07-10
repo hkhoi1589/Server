@@ -82,13 +82,15 @@ const SocketServer = (socket, io) => {
 
 	// Check User Online / Offline
 	socket.on('checkUserOnline', (data) => {
-		console.log(users);
 		// user is online in follwing
-		const followingOnline = users.filter((user) =>
-			data.following.some((item) => item._id === user.id)
+		const followersOnline = users.filter((user) =>
+			data.followers.some((item) => item._id === user.id)
 		);
-		console.log('Following:', followingOnline);
-		//socket.emit('checkUserOnlineToMe', followingOnline);
+		const msg = { _id: data._id, username: data.username, profilePicture: data.profilePicture };
+		followersOnline.map((followers) =>
+			socket.to(`${followers.socketId}`).emit('checkUserOnlineToMe', msg)
+		);
+		//gui cho followers
 	});
 
 	socket.on('disconnect', () => {
