@@ -199,7 +199,7 @@ exports.deleteUser = async (req, res) => {
 	const id = getUserId(req);
 
 	try {
-		// find and update
+		// find
 		let user = await User.findById(id);
 
 		// loai user khoi followers
@@ -217,7 +217,7 @@ exports.deleteUser = async (req, res) => {
 		});
 
 		//xoa post cua user
-		await Post.findOneAndDelete({ author: new mongoose.Types.ObjectId(id) });
+		await Post.deleteMany({ author: id });
 
 		// xoa user
 		await User.findByIdAndDelete(id);
