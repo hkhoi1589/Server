@@ -17,8 +17,8 @@ const SocketServer = (socket, io) => {
 
 	// Likes
 	socket.on('likePost', (newPost) => {
-		const ids = [...newPost.user.followers, newPost.user._id];
-		const clients = users.filter((user) => ids.includes(user.id));
+		const ids = [...newPost.author.followers, newPost.author._id];
+		const clients = users.filter((user) => ids.some((id) => id === user.id));
 
 		if (clients.length > 0) {
 			clients.forEach((client) => {
@@ -28,8 +28,8 @@ const SocketServer = (socket, io) => {
 	});
 
 	socket.on('unLikePost', (newPost) => {
-		const ids = [...newPost.user.followers, newPost.user._id];
-		const clients = users.filter((user) => ids.includes(user.id));
+		const ids = [...newPost.author.followers, newPost.author._id];
+		const clients = users.filter((user) => ids.some((id) => id === user.id));
 
 		if (clients.length > 0) {
 			clients.forEach((client) => {
@@ -41,7 +41,7 @@ const SocketServer = (socket, io) => {
 	// Comments
 	socket.on('createComment', (newPost) => {
 		const ids = [...newPost.user.followers, newPost.user._id];
-		const clients = users.filter((user) => ids.includes(user.id));
+		const clients = users.filter((user) => ids.some((id) => id === user.id));
 
 		if (clients.length > 0) {
 			clients.forEach((client) => {
@@ -52,7 +52,7 @@ const SocketServer = (socket, io) => {
 
 	socket.on('deleteComment', (newPost) => {
 		const ids = [...newPost.user.followers, newPost.user._id];
-		const clients = users.filter((user) => ids.includes(user.id));
+		const clients = users.filter((user) => ids.some((id) => id === user.id));
 
 		if (clients.length > 0) {
 			clients.forEach((client) => {
@@ -87,7 +87,7 @@ const SocketServer = (socket, io) => {
 			data.following.some((item) => item._id === user.id)
 		);
 		// tra ve following cho user
-		socket.emit('checkUserOnlineToMe', following);
+		socket.emit('checkUserOnlineToMe', following.id);
 
 		// tim followers dang online
 		const clients = users.filter((user) => data.followers.some((item) => item._id === user.id));

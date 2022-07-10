@@ -117,7 +117,8 @@ exports.updatePost = async (req, res) => {
 				},
 				{ new: true }
 			)
-				.select('likers')
+				.select('likers author')
+				.populate([{ path: 'author', select: 'followers' }]) // for socket
 				.lean();
 
 			if (post) {
@@ -139,7 +140,8 @@ exports.updatePost = async (req, res) => {
 				},
 				{ new: true }
 			)
-				.select('likers')
+				.select('likers author')
+				.populate([{ path: 'author', select: 'followers' }]) // for socket
 				.lean();
 
 			if (post) {
