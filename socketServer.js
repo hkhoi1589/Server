@@ -1,14 +1,14 @@
 const User = require('./models').users;
 const mongoose = require('mongoose');
 
-let users = [];
+let users = new Set();
 
 const SocketServer = (socket, io) => {
 	// Connect - Disconnect
 	socket.on('joinUser', (user) => {
-		users.push({
+		users.add({
 			id: user._id,
-			socketId: io.id,
+			socketId: socket.id,
 			following: user.following,
 			followers: user.followers,
 		});
