@@ -1,3 +1,5 @@
+const User = require("./models/Users.model");
+
 let users = [];
 
 const EditData = (data, id, call) => {
@@ -65,7 +67,22 @@ const SocketServer = (socket) => {
 	// Notification
 	socket.on('createNotify', (msg) => {
 		const client = users.find((user) => user.id === msg.clientId);
-		console.log(client);
+		if(!client){// client offline
+			// luu truoc vao db
+			await User.findByIdAndUpdate(
+				id,
+				{
+					$push: {
+						noti: {
+							user: new mongoose.Types.ObjectId(req.body.userId),
+							text: req.body.text,
+							url: req.body.url,
+							isRead: false,
+						},
+					},
+				},
+			)
+		}
 		client && socket.to(`${client.socketId}`).emit('createNotifyToClient', msg);
 	});
 
@@ -101,14 +118,6 @@ const SocketServer = (socket) => {
 				clients.forEach((client) => {
 					socket.to(`${client.socketId}`).emit('CheckUserOffline', data.id);
 				});
-			}
-
-			if (data.call) {
-				const callUser = users.find((user) => user.id === data.call);
-				if (callUser) {
-					users = EditData(users, callUser.id, null);
-					socket.to(`${callUser.socketId}`).emit('callerDisconnect');
-				}
 			}
 		}
 
