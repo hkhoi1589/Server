@@ -2,7 +2,7 @@ const User = require('./models').users;
 const mongoose = require('mongoose');
 
 let tmp = new Set();
-let users = Array.from(tmp);
+let users;
 
 const SocketServer = (socket, io) => {
 	// Connect - Disconnect
@@ -13,6 +13,7 @@ const SocketServer = (socket, io) => {
 			following: user.following,
 			followers: user.followers,
 		});
+		users = Array.from(tmp);
 	});
 
 	// Likes
