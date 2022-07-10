@@ -171,15 +171,8 @@ exports.updatePost = async (req, res) => {
 				{ new: true }
 			)
 				.select('comments author')
-				.populate(
-					{
-						path: 'comments',
-						populate: { path: 'user', select: 'username profilePicture' },
-					},
-					{ path: 'author', select: 'followers' }
-				)
 				.lean();
-
+			console.log(cmt);
 			if (cmt) {
 				return res.status(200).json(cmt);
 			} else {
