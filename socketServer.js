@@ -88,6 +88,7 @@ const SocketServer = (socket, io) => {
 			data.following.some((item) => item._id === user.id)
 		);
 		console.log('Following:', followingOnline);
+		socket.to(`${client.socketId}`).emit('checkUserOnlineToMe', msg);
 		//socket.emit('checkUserOnlineToMe', followingOnline);
 	});
 
