@@ -65,6 +65,7 @@ const SocketServer = (socket) => {
 	// Notification
 	socket.on('createNotify', (msg) => {
 		const client = users.find((user) => user.id === msg.clientId);
+		console.log(client);
 		client && socket.to(`${client.socketId}`).emit('createNotifyToClient', msg);
 	});
 
