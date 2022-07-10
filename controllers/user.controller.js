@@ -1,4 +1,5 @@
 const User = require('../models').users;
+const Post = require('../models').posts;
 const mongoose = require('mongoose');
 const bcrypt = require('bcrypt');
 const { handlePassword, sendToken, getUserId } = require('../helpers');
@@ -214,6 +215,9 @@ exports.deleteUser = async (req, res) => {
 				$pull: { followers: id },
 			});
 		});
+
+		//xoa post cua user
+		await Post.findOneAndDelete({ author: _id });
 
 		// xoa user
 		await User.findByIdAndDelete(id);
