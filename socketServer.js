@@ -40,7 +40,7 @@ const SocketServer = (socket, io) => {
 
 	// Comments
 	socket.on('createComment', (newPost) => {
-		const ids = [...newPost.user.followers, newPost.user._id];
+		const ids = [...newPost.author.followers, newPost.author._id];
 		const clients = users.filter((user) => ids.some((id) => id === user.id));
 
 		if (clients.length > 0) {
@@ -51,7 +51,7 @@ const SocketServer = (socket, io) => {
 	});
 
 	socket.on('deleteComment', (newPost) => {
-		const ids = [...newPost.user.followers, newPost.user._id];
+		const ids = [...newPost.author.followers, newPost.author._id];
 		const clients = users.filter((user) => ids.some((id) => id === user.id));
 
 		if (clients.length > 0) {

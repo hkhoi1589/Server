@@ -170,11 +170,14 @@ exports.updatePost = async (req, res) => {
 				},
 				{ new: true }
 			)
-				.select('comments')
-				.populate({
-					path: 'comments',
-					populate: { path: 'user', select: 'username profilePicture' },
-				})
+				.select('comments author')
+				.populate(
+					{
+						path: 'comments',
+						populate: { path: 'user', select: 'username profilePicture' },
+					},
+					{ path: 'author', select: 'followers' }
+				)
 				.lean();
 
 			if (cmt) {
@@ -199,13 +202,16 @@ exports.updatePost = async (req, res) => {
 					},
 				},
 				{ new: true }
-			).lean();
+			)
+				.select('author')
+				.populate({ path: 'author', select: 'followers' })
+				.lean();
 
 			if (cmt) {
 				return res.status(200).json({
 					message: `Deleted comment`,
 					type: 'success',
-					deletedCmt: { _id: id, commentId: req.body.commentId },
+					deletedCmt: { ...cmt, commentId: req.body.commentId },
 				});
 			} else {
 				return res.status(404).json({ message: 'Comment is not found', type: 'error' });
