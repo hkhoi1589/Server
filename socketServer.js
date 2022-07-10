@@ -7,15 +7,12 @@ const SocketServer = (socket) => {
 	// Connect - Disconnect
 	socket.on('joinUser', (user) => {
 		console.log('Hi');
-		users = [
-			...users,
-			{
-				id: user._id,
-				socketId: socket.id,
-				following: user.following,
-				followers: user.followers,
-			},
-		];
+		users.push({
+			id: user._id,
+			socketId: socket.id,
+			following: user.following,
+			followers: user.followers,
+		});
 		console.log(users);
 	});
 
@@ -81,7 +78,7 @@ const SocketServer = (socket) => {
 					},
 				},
 			});
-		} else client && socket.to(`${client.socketId}`).emit('createNotifyToClient', msg);
+		} else socket.to(`${client.socketId}`).emit('createNotifyToClient', msg);
 	});
 
 	// Check User Online / Offline
