@@ -81,18 +81,11 @@ const SocketServer = (socket) => {
 
 	// Check User Online / Offline
 	socket.on('checkUserOnline', (data) => {
+		// for user
 		const following = users.filter((user) =>
 			data.following.find((item) => item._id === user.id)
 		);
 		socket.emit('checkUserOnlineToMe', following);
-
-		const clients = users.filter((user) => data.followers.find((item) => item._id === user.id));
-
-		if (clients.length > 0) {
-			clients.forEach((client) => {
-				socket.to(`${client.socketId}`).emit('checkUserOnlineToClient', data._id);
-			});
-		}
 	});
 
 	socket.on('disconnect', () => {
@@ -101,12 +94,6 @@ const SocketServer = (socket) => {
 			const clients = users.filter((user) =>
 				data.followers.find((item) => item._id === user.id)
 			);
-
-			if (clients.length > 0) {
-				clients.forEach((client) => {
-					socket.to(`${client.socketId}`).emit('CheckUserOffline', data.id);
-				});
-			}
 		}
 
 		users = users.filter((user) => user.socketId !== socket.id);

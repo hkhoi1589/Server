@@ -51,7 +51,6 @@ const User = mongoose.model(
 						url: String,
 						isRead: Boolean,
 					},
-					{ timestamps: true },
 				],
 				default: [],
 			},
