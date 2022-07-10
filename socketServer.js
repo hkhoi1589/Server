@@ -63,7 +63,7 @@ const SocketServer = (socket, io) => {
 
 	// Notification
 	socket.on('createNotify', async (msg) => {
-		const client = users.filter((user) => user.id === msg.clientId);
+		const client = users.filter((user) => user.id === msg.clientId)[0];
 		if (!client) {
 			// neu client offline
 			// luu truoc vao db
@@ -82,14 +82,14 @@ const SocketServer = (socket, io) => {
 
 	// Online/Offline
 	socket.on('checkUserOnline', (data) => {
-		// tim following dang online
+		// tim followings dang online
 		const following = users.filter((user) =>
 			data.following.some((item) => item._id === user.id)
 		);
 		// tra ve following cho user
 		socket.emit('checkUserOnlineToMe', following);
 
-		// tim following dang online
+		// tim followers dang online
 		const clients = users.filter((user) => data.followers.some((item) => item._id === user.id));
 
 		// thong bao user dang online cho followers
@@ -106,9 +106,8 @@ const SocketServer = (socket, io) => {
 	});
 
 	socket.on('disconnect', () => {
-		const data = users.filter((user) => user.socketId === socket.id);
+		const data = users.filter((user) => user.socketId === socket.id)[0];
 		if (data) {
-			console.log(data);
 			const clients = users.filter((user) =>
 				data.followers.some((item) => item._id === user.id)
 			);
