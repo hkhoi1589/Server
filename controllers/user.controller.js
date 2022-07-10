@@ -141,6 +141,10 @@ exports.updateUser = async (req, res) => {
 				{ new: true }
 			)
 				.select('noti')
+				.populate({
+					path: 'noti',
+					populate: { path: 'user', select: 'username profilePicture' },
+				})
 				.lean();
 
 			if (noti) {
