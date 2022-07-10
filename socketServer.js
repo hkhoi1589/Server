@@ -1,17 +1,18 @@
 const User = require('./models').users;
 const mongoose = require('mongoose');
 
-let users = new Set();
-
+let users = [];
+// users trung lap
 const SocketServer = (socket, io) => {
 	// Connect - Disconnect
 	socket.on('joinUser', (user) => {
-		users.add({
-			id: user._id,
-			socketId: socket.id,
-			following: user.following,
-			followers: user.followers,
-		});
+		if (users.every((item) => item.id !== user._id))
+			users.push({
+				id: user._id,
+				socketId: socket.id,
+				following: user.following,
+				followers: user.followers,
+			});
 	});
 
 	// Likes
@@ -62,7 +63,7 @@ const SocketServer = (socket, io) => {
 
 	// Notification
 	socket.on('createNotify', async (msg) => {
-		const client = Array.from(users).find((user) => user.id === msg.clientId);
+		const client = users.find((user) => user.id === msg.clientId);
 		if (!client) {
 			// neu client offline
 			// luu truoc vao db
@@ -83,7 +84,7 @@ const SocketServer = (socket, io) => {
 	socket.on('checkUserOnline', (data) => {
 		console.log(users);
 		// user is online in follwing
-		const following = Array.from(users).filter((user) =>
+		const following = users.filter((user) =>
 			data.following.find((item) => item._id === user.id)
 		);
 		console.log('Following:', following);
@@ -91,9 +92,9 @@ const SocketServer = (socket, io) => {
 	});
 
 	socket.on('disconnect', () => {
-		const data = Array.from(users).find((user) => user.socketId === socket.id);
+		const data = users.find((user) => user.socketId === socket.id);
 		if (data) {
-			const clients = Array.from(users).filter((user) =>
+			const clients = users.filter((user) =>
 				data.followers.find((item) => item._id === user.id)
 			);
 
@@ -104,7 +105,7 @@ const SocketServer = (socket, io) => {
 			}
 		}
 
-		users = Array.from(users).filter((user) => user.socketId !== socket.id);
+		users = users.filter((user) => user.socketId !== socket.id);
 	});
 };
 
