@@ -88,6 +88,10 @@ exports.login = async (req, res) => {
 				{ path: 'following', select: 'username profilePicture' },
 				{ path: 'followers', select: 'username profilePicture' },
 				{
+					path: 'noti',
+					populate: { path: 'user', select: 'username profilePicture' },
+				},
+				{
 					path: 'saved',
 					populate: { path: 'author', select: 'username profilePicture' },
 				},
@@ -137,10 +141,6 @@ exports.updateUser = async (req, res) => {
 				{ new: true }
 			)
 				.select('noti')
-				.populate({
-					path: 'noti',
-					populate: { path: 'user', select: 'username profilePicture' },
-				})
 				.lean();
 
 			if (noti) {
@@ -229,6 +229,10 @@ exports.getUser = async (req, res) => {
 			.populate([
 				{ path: 'following', select: 'username profilePicture' },
 				{ path: 'followers', select: 'username profilePicture' },
+				{
+					path: 'noti',
+					populate: { path: 'user', select: 'username profilePicture' },
+				},
 				{
 					path: 'saved',
 					populate: { path: 'author', select: 'username profilePicture' },
