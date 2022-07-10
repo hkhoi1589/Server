@@ -1,4 +1,5 @@
 const User = require('./models').users;
+const mongoose = require('mongoose');
 
 let users = [];
 
