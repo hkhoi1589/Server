@@ -94,12 +94,12 @@ const SocketServer = (socket, io) => {
 	// Online/Offline
 	socket.on('checkUserOnline', (data) => {
 		// tim followings dang online
-		const following = data.following.filter((f) => users.some((user) => user.id === f._id));
-		// tra ve ds following cho user
+		const following = data.following.filter((f) => users.some((user) => user._id === f.id));
+		// tra ve following cho user
 		socket.emit('checkUserOnlineToMe', following);
 
 		// tim followers dang online
-		const clients = data.followers.filter((f) => users.some((user) => user.id === f._id));
+		const clients = users.filter((user) => data.followers.some((item) => item._id === user.id));
 
 		// thong bao user dang online cho followers
 		if (clients.length > 0) {
