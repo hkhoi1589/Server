@@ -270,16 +270,6 @@ exports.getUser = async (req, res) => {
 				return res.status(404).json({ message: 'User is not found', type: 'error' });
 			}
 		}
-
-		if (req.body.action === 'onlineUser') {
-			let user = await User.findById(id).select('username profilePicture').lean();
-
-			if (user) {
-				return res.status(200).json(user);
-			} else {
-				return res.status(404).json({ message: 'User is not found', type: 'error' });
-			}
-		}
 	} catch (error) {
 		return res.status(500).json({ message: error.message, type: 'error' });
 	}

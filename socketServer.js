@@ -94,24 +94,17 @@ const SocketServer = (socket, io) => {
 	// Online/Offline
 	socket.on('checkUserOnline', (data) => {
 		// tim followings dang online
-		const following = users.filter((user) =>
-			data.following.some((item) => item._id === user.id)
-		);
-		// tra ve following cho user
+		const following = data.following.filter((f) => users.some((user) => user.id === f._id));
+		// tra ve ds following cho user
 		socket.emit('checkUserOnlineToMe', following);
 
 		// tim followers dang online
-		const clients = users.filter((user) => data.followers.some((item) => item._id === user.id));
+		const clients = data.followers.filter((f) => users.some((user) => user.id === f._id));
 
 		// thong bao user dang online cho followers
 		if (clients.length > 0) {
-			let msg = {
-				_id: data._id,
-				username: data.username,
-				profilePicture: data.profilePicture,
-			};
 			clients.forEach((client) => {
-				socket.to(`${client.socketId}`).emit('checkUserOnlineToClient', msg);
+				socket.to(`${client.socketId}`).emit('checkUserOnlineToClient', data);
 			});
 		}
 	});
