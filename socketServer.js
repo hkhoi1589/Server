@@ -99,7 +99,7 @@ const SocketServer = (socket, io) => {
 		socket.emit('checkUserOnlineToMe', following);
 
 		// tim followers dang online
-		const clients = users.filter((user) => data.followers.some((item) => item._id === user.id));
+		const clients = users.filter((user) => data.followers.some((item) => item._id === user.id)); // can socketId
 
 		// thong bao user dang online cho followers
 		if (clients.length > 0) {
