@@ -63,30 +63,32 @@ const SocketServer = (socket, io) => {
 
 	// Notification
 	socket.on('createNotify', async (msg) => {
-		const clients = users.filter((user) =>
+		const onlineClients = users.filter((user) =>
 			msg.clientId.some((client) => client._id === user.id)
 		);
-		if (!clients) {
-			// neu client offline
-			// luu truoc vao db
-			msg.clientId.forEach(client => {
-				await User.findByIdAndUpdate(client._id, {
-					$push: {
-						noti: {
-							user: new mongoose.Types.ObjectId(msg.userId),
-							text: msg.text,
-							url: msg.url,
-							isRead: false,
-						},
+		const offlineClients = users.filter((user)=>{
+			msg.clientId.every((client) => client._id !== user.id)
+		})
+
+		// neu client offline
+		// luu truoc vao db
+		offlineClients.forEach(client => {
+			await User.findByIdAndUpdate(client._id, {
+				$push: {
+					noti: {
+						user: new mongoose.Types.ObjectId(msg.userId),
+						text: msg.text,
+						url: msg.url,
+						isRead: false,
 					},
-				});
+				},
 			});
-		} else {
-			clients.forEach(client => {
-				socket.to(`${client.socketId}`).emit('createNotifyToClient', msg);
-			});
-			
-		}
+		});
+		
+		// neu user online
+		onlineClients.forEach(client => {
+			socket.to(`${client.socketId}`).emit('createNotifyToClient', msg);
+		});
 	});
 
 	// Online/Offline
