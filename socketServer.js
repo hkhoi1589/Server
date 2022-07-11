@@ -97,6 +97,8 @@ const SocketServer = (socket, io) => {
 		const following = users.filter((user) =>
 			data.following.some((item) => item._id === user.id)
 		);
+		console.log('Data', data);
+		console.log('Following', following);
 		// tra ve following cho user
 		socket.emit('checkUserOnlineToMe', following.id);
 
