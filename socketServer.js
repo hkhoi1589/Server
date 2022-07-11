@@ -66,13 +66,13 @@ const SocketServer = (socket, io) => {
 		const onlineClients = users.filter((user) =>
 			msg.clientId.some((client) => client._id === user.id)
 		);
-		const offlineClients = users.filter((user)=>{
-			msg.clientId.every((client) => client._id !== user.id)
-		})
+		const offlineClients = users.filter((user) => {
+			msg.clientId.every((client) => client._id !== user.id);
+		});
 
 		// neu client offline
 		// luu truoc vao db
-		offlineClients.forEach(client => {
+		offlineClients.forEach(async (client) => {
 			await User.findByIdAndUpdate(client._id, {
 				$push: {
 					noti: {
@@ -84,9 +84,9 @@ const SocketServer = (socket, io) => {
 				},
 			});
 		});
-		
+
 		// neu user online
-		onlineClients.forEach(client => {
+		onlineClients.forEach((client) => {
 			socket.to(`${client.socketId}`).emit('createNotifyToClient', msg);
 		});
 	});
