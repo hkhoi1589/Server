@@ -62,21 +62,18 @@ const SocketServer = (socket, io) => {
 	});
 
 	// Follow
-	socket.on('follow', (newUser) => {
-		const user = users.filter((user) => user.id === newUser._id);
-		console.log('follow', user);
-		console.log('follow', newUser);
+	socket.on('follow', ({ authUser, followingUser }) => {
+		const user = users.filter((user) => user.id === followingUser._id)[0];
 
 		// neu followingUser dang onl
-		if (user) socket.to(`${user.socketId}`).emit('followToClient', newUser);
+		if (user) socket.to(`${user.socketId}`).emit('followToClient', authUser);
 	});
 
-	socket.on('unFollow', (newUser) => {
-		const user = users.filter((user) => user.id === newUser._id);
-		console.log('follow', user);
-		console.log('follow', newUser);
+	socket.on('unFollow', ({ authUser, unfollowingUser }) => {
+		const user = users.filter((user) => user.id === unfollowingUser._id)[0];
+
 		// neu followingUser dang onl
-		if (user) socket.to(`${user.socketId}`).emit('unFollowToClient', newUser);
+		if (user) socket.to(`${user.socketId}`).emit('unFollowToClient', authUser);
 	});
 
 	// Notification
