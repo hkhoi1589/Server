@@ -11,7 +11,11 @@ const helmet = require('helmet'); //secure your Express apps by setting various 
 const routes = require('./routes');
 
 const app = express();
-app.use(cors());
+app.use(
+	cors({
+		origin: ['http://localhost:3000', 'https://social-server-demo.herokuapp.com/'], // domain cua client
+	})
+);
 
 //connect mongodb
 db.connect();
