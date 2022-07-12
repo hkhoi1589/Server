@@ -289,11 +289,7 @@ exports.follow = async (req, res) => {
 			},
 			{ new: true }
 		)
-			.select('username profilePicture following followers')
-			.populate([
-				{ path: 'following', select: 'username profilePicture' },
-				{ path: 'followers', select: 'username profilePicture' },
-			])
+			.select('username profilePicture')
 			.lean();
 
 		await User.findOneAndUpdate(
