@@ -194,7 +194,7 @@ exports.updateUser = async (req, res) => {
 	}
 };
 
-// delete user
+// delete user(chua xong)
 exports.deleteUser = async (req, res) => {
 	const id = getUserId(req);
 
@@ -290,6 +290,10 @@ exports.follow = async (req, res) => {
 			{ new: true }
 		)
 			.select('username profilePicture')
+			.populate([
+				{ path: 'following', select: 'username profilePicture' },
+				{ path: 'followers', select: 'username profilePicture' },
+			])
 			.lean();
 
 		await User.findOneAndUpdate(
