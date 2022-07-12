@@ -64,7 +64,8 @@ const SocketServer = (socket, io) => {
 	// Follow
 	socket.on('follow', ({ authUser, followingUser }) => {
 		const user = users.filter((user) => user.id === followingUser._id)[0];
-
+		console.log('user', user);
+		console.log('authUser', authUser);
 		// neu followingUser dang onl
 		if (user) socket.to(`${user.socketId}`).emit('followToClient', authUser);
 	});
