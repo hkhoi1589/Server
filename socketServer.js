@@ -64,6 +64,8 @@ const SocketServer = (socket, io) => {
 	// Follow
 	socket.on('follow', (newUser) => {
 		const user = users.filter((user) => user.id === newUser._id);
+		console.log('follow', user);
+		console.log('follow', newUser);
 
 		// neu followingUser dang onl
 		if (user) socket.to(`${user.socketId}`).emit('followToClient', newUser);
@@ -71,7 +73,8 @@ const SocketServer = (socket, io) => {
 
 	socket.on('unFollow', (newUser) => {
 		const user = users.filter((user) => user.id === newUser._id);
-
+		console.log('follow', user);
+		console.log('follow', newUser);
 		// neu followingUser dang onl
 		if (user) socket.to(`${user.socketId}`).emit('unFollowToClient', newUser);
 	});
