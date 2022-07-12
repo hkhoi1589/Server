@@ -280,6 +280,7 @@ exports.follow = async (req, res) => {
 	const { friendId } = req.params;
 	const id = getUserId(req);
 	if (!friendId) return res.status(404).json({ message: 'No user ID found', type: 'error' });
+	console.log(friendId);
 
 	try {
 		await User.findOneAndUpdate(
@@ -309,7 +310,7 @@ exports.unfollow = async (req, res) => {
 	const { friendId } = req.params;
 	const id = getUserId(req);
 	if (!friendId) return res.status(404).json({ message: 'No ID found', type: 'error' });
-
+	console.log(friendId);
 	try {
 		await User.findOneAndUpdate(
 			{ _id: id },
