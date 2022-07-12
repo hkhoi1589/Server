@@ -28,7 +28,7 @@ const server = http.createServer(app); // http server
 const { Server } = require('socket.io');
 const io = new Server(server, {
 	cors: {
-		origin: 'http://localhost:3000', // domain cua client
+		origin: ['http://localhost:3000', 'https://social-server-demo.herokuapp.com/'], // domain cua client
 	},
 });
 
