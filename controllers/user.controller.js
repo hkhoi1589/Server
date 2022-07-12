@@ -194,7 +194,7 @@ exports.updateUser = async (req, res) => {
 	}
 };
 
-// delete user(chua xong)
+// delete user
 exports.deleteUser = async (req, res) => {
 	const id = getUserId(req);
 
