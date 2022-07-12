@@ -288,7 +288,7 @@ exports.follow = async (req, res) => {
 				$push: { following: new mongoose.Types.ObjectId(friendId) },
 			},
 			{ new: true }
-		).lean();
+		);
 
 		await User.findOneAndUpdate(
 			{ _id: friendId },
@@ -317,7 +317,7 @@ exports.unfollow = async (req, res) => {
 				$pull: { following: friendId },
 			},
 			{ new: true }
-		).lean();
+		);
 
 		await User.findOneAndUpdate(
 			{ _id: friendId },
