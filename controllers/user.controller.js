@@ -282,13 +282,16 @@ exports.follow = async (req, res) => {
 	if (!friendId) return res.status(404).json({ message: 'No user ID found', type: 'error' });
 
 	try {
-		await User.findOneAndUpdate(
+		const user = await User.findOneAndUpdate(
 			{ _id: id },
 			{
 				$push: { following: new mongoose.Types.ObjectId(friendId) },
 			},
 			{ new: true }
-		);
+		)
+			.select('username profilePicture following')
+			.populate([{ path: 'following', select: 'username profilePicture' }])
+			.lean();
 
 		await User.findOneAndUpdate(
 			{ _id: friendId },
@@ -298,7 +301,7 @@ exports.follow = async (req, res) => {
 			{ new: true }
 		);
 
-		return res.status(200);
+		return res.status(200).json({ message: 'Followed this user', type: 'success', user });
 	} catch (error) {
 		return res.status(500).json({ message: error.message, type: 'error' });
 	}
@@ -309,14 +312,18 @@ exports.unfollow = async (req, res) => {
 	const { friendId } = req.params;
 	const id = getUserId(req);
 	if (!friendId) return res.status(404).json({ message: 'No ID found', type: 'error' });
+
 	try {
-		await User.findOneAndUpdate(
+		const user = await User.findOneAndUpdate(
 			{ _id: id },
 			{
 				$pull: { following: friendId },
 			},
 			{ new: true }
-		);
+		)
+			.select('username profilePicture following')
+			.populate([{ path: 'following', select: 'username profilePicture' }])
+			.lean();
 
 		await User.findOneAndUpdate(
 			{ _id: friendId },
@@ -326,7 +333,7 @@ exports.unfollow = async (req, res) => {
 			{ new: true }
 		);
 
-		return res.status(200);
+		return res.status(200).json({ message: 'Unfollowed this user', type: 'success', user });
 	} catch (error) {
 		return res.status(500).json({ message: error.message, type: 'error' });
 	}
