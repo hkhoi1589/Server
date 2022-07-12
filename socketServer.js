@@ -64,12 +64,12 @@ const SocketServer = (socket, io) => {
 	// Follow
 	socket.on('follow', (newUser) => {
 		const user = users.find((user) => user.id === newUser._id);
-		console.log('follow', user);
 		user && socket.to(`${user.socketId}`).emit('followToClient', newUser);
 	});
 
 	socket.on('unFollow', (newUser) => {
 		const user = users.find((user) => user.id === newUser._id);
+		console.log('unFollow', user);
 		user && socket.to(`${user.socketId}`).emit('unFollowToClient', newUser);
 	});
 
