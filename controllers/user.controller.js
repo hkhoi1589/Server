@@ -290,7 +290,10 @@ exports.follow = async (req, res) => {
 			{ new: true }
 		)
 			.select('username profilePicture following followers')
-			.populate('followers following', '-password')
+			.populate([
+				{ path: 'following', select: 'username profilePicture' },
+				{ path: 'followers', select: 'username profilePicture' },
+			])
 			.lean();
 
 		await User.findOneAndUpdate(
@@ -322,7 +325,10 @@ exports.unfollow = async (req, res) => {
 			{ new: true }
 		)
 			.select('username profilePicture following followers')
-			.populate('followers following', '-password')
+			.populate([
+				{ path: 'following', select: 'username profilePicture' },
+				{ path: 'followers', select: 'username profilePicture' },
+			])
 			.lean();
 
 		await User.findOneAndUpdate(
