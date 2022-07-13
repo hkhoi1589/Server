@@ -317,10 +317,18 @@ exports.unfollow = async (req, res) => {
 	if (!friendId) return res.status(404).json({ message: 'No ID found', type: 'error' });
 
 	try {
-		const user = await User.findOneAndUpdate(
+		await User.findOneAndUpdate(
 			{ _id: id },
 			{
 				$pull: { following: friendId },
+			},
+			{ new: true }
+		);
+
+		const user = await User.findOneAndUpdate(
+			{ _id: friendId },
+			{
+				$pull: { followers: id },
 			},
 			{ new: true }
 		)
@@ -330,14 +338,6 @@ exports.unfollow = async (req, res) => {
 				{ path: 'followers', select: 'username profilePicture' },
 			])
 			.lean();
-
-		await User.findOneAndUpdate(
-			{ _id: friendId },
-			{
-				$pull: { followers: id },
-			},
-			{ new: true }
-		);
 
 		return res.status(200).json({ message: 'Unfollowed this user', type: 'success', user });
 	} catch (error) {
