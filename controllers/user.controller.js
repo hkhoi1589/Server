@@ -304,7 +304,7 @@ exports.follow = async (req, res) => {
 			])
 			.lean();
 
-		return res.status(200).json(user);
+		return res.status(200).json({ message: 'Followed this user', type: 'success', user });
 	} catch (error) {
 		return res.status(500).json({ message: error.message, type: 'error' });
 	}
@@ -339,7 +339,7 @@ exports.unfollow = async (req, res) => {
 			])
 			.lean();
 
-		return res.status(200).json(user);
+		return res.status(200).json({ message: 'Unfollowed this user', type: 'success', user });
 	} catch (error) {
 		return res.status(500).json({ message: error.message, type: 'error' });
 	}
