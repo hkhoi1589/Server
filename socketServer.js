@@ -81,7 +81,7 @@ const SocketServer = (socket, io) => {
 			msg.clientId.every((client) => client._id !== user.id);
 		});
 
-		// neu client offline
+		// neu clients offline
 		// luu truoc vao db
 		offlineClients.forEach(async (client) => {
 			await User.findByIdAndUpdate(client._id, {
@@ -96,9 +96,29 @@ const SocketServer = (socket, io) => {
 			});
 		});
 
-		// neu user online
+		// neu clients online
 		onlineClients.forEach((client) => {
-			socket.to(`${client.socketId}`).emit('createNotifyToClient', msg);
+			const noti = await User.findByIdAndUpdate(
+				client._id,
+				{
+					$push: {
+						noti: {
+							user: new mongoose.Types.ObjectId(msg.userId),
+						text: msg.text,
+						url: msg.url,
+						isRead: false,
+						},
+					},
+				},
+				{ new: true }
+			)
+				.select('noti')
+				.populate({
+					path: 'noti',
+					populate: { path: 'user', select: 'username profilePicture' },
+				})
+				.lean();
+			socket.to(`${client.socketId}`).emit('createNotifyToClient', noti);
 		});
 	});
 

@@ -123,41 +123,6 @@ exports.updateUser = async (req, res) => {
 	const { username, email, password, desc, coverPicture, profilePicture } = req.body;
 	const id = getUserId(req);
 
-	if (req.body.action === 'addNoti') {
-		if (req.body.text.length === 0)
-			return res.status(400).json({ message: 'Text is empty', type: 'error' });
-		try {
-			const noti = await User.findByIdAndUpdate(
-				id,
-				{
-					$push: {
-						noti: {
-							user: new mongoose.Types.ObjectId(req.body.userId),
-							text: req.body.text,
-							url: req.body.url,
-							isRead: false,
-						},
-					},
-				},
-				{ new: true }
-			)
-				.select('noti')
-				.populate({
-					path: 'noti',
-					populate: { path: 'user', select: 'username profilePicture' },
-				})
-				.lean();
-
-			if (noti) {
-				return res.status(200).json(noti);
-			} else {
-				return res.status(404).json({ message: 'User is not found', type: 'error' });
-			}
-		} catch (error) {
-			return res.status(500).json({ message: error.message, type: 'error' });
-		}
-	}
-
 	if (req.body.action === 'clearNoti') {
 		try {
 			await User.updateMany(
