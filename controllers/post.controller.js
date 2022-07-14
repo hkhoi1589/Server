@@ -158,7 +158,7 @@ exports.updatePost = async (req, res) => {
 		if (req.body.text.length === 0)
 			return res.status(400).json({ message: 'Comment is empty', type: 'error' });
 		try {
-			const cmt = await Post.findByIdAndUpdate(
+			const post = await Post.findByIdAndUpdate(
 				id,
 				{
 					$push: {
@@ -180,10 +180,10 @@ exports.updatePost = async (req, res) => {
 				])
 				.lean();
 
-			if (cmt) {
-				return res.status(200).json(cmt);
+			if (post) {
+				return res.status(200).json(post);
 			} else {
-				return res.status(404).json({ message: 'Comment is not found', type: 'error' });
+				return res.status(404).json({ message: 'Post is not found', type: 'error' });
 			}
 		} catch (error) {
 			return res.status(500).json({ message: error.message, type: 'error' });
