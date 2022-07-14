@@ -118,6 +118,7 @@ const SocketServer = (socket, io) => {
 					populate: { path: 'user', select: 'username profilePicture' },
 				})
 				.lean();
+			console.log('noti', noti);
 			socket.to(`${client.socketId}`).emit('createNotifyToClient', noti);
 		});
 	});
