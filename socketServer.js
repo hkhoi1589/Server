@@ -98,7 +98,7 @@ const SocketServer = (socket, io) => {
 
 		// neu clients online
 		onlineClients.forEach(async (client) => {
-			const noti = await User.findByIdAndUpdate(
+			const user = await User.findByIdAndUpdate(
 				client.id,
 				{
 					$push: {
@@ -118,7 +118,9 @@ const SocketServer = (socket, io) => {
 					populate: { path: 'user', select: 'username profilePicture' },
 				})
 				.lean();
-			socket.to(`${client.socketId}`).emit('createNotifyToClient', noti);
+			socket
+				.to(`${client.socketId}`)
+				.emit('createNotifyToClient', user.noti[user.noti.length - 1]);
 		});
 	});
 
