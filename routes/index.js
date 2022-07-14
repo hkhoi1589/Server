@@ -1,7 +1,7 @@
 const userRoute = require('./user.routes');
 const authRoute = require('./auth.routes');
 const postRoute = require('./post.routes');
-const jwt = require('jsonwebtoken');
+const { verifyKey } = require('../helpers');
 
 // kiem tra token tu cac request den server
 const verifyToken = (req, res, next) => {
@@ -10,7 +10,7 @@ const verifyToken = (req, res, next) => {
 		return res.status(403).send('A token is required for authentication');
 	}
 	try {
-		const decoded = jwt.verify(token, process.env.JWT_KEY);
+		const decoded = verifyKey(token, process.env.ACCESS_TOKEN_SECRET);
 		req.user = decoded;
 	} catch (err) {
 		return res.status(401).send('Invalid Token');

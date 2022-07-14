@@ -1,8 +1,14 @@
 const User = require('../models').users;
 const Post = require('../models').posts;
 const mongoose = require('mongoose');
-const bcrypt = require('bcrypt');
-const { handlePassword, sendToken, getUserId } = require('../helpers');
+const {
+	handlePassword,
+	comparePassword,
+	getUserId,
+	createAccessToken,
+	createRefreshToken,
+	verifyKey,
+} = require('../helpers');
 
 // Get random friend
 exports.getFriend = async (req, res) => {
@@ -66,7 +72,14 @@ exports.register = async (req, res) => {
 		// Save to DB
 		await user.save();
 
-		const token = sendToken(user);
+		const token = createAccessToken({ id: user._id });
+		const refresh_token = createRefreshToken({ id: user._id });
+
+		res.cookie('refreshtoken', refresh_token, {
+			httpOnly: true,
+			path: '/api/auth/refresh_token',
+			maxAge: 30 * 24 * 60 * 60 * 1000, // 30days
+		});
 
 		return res.status(200).json({
 			message: 'Register successfully',
@@ -85,6 +98,7 @@ exports.login = async (req, res) => {
 	try {
 		// Find user
 		const user = await User.findOne({ email })
+			.select('-password')
 			.populate([
 				{ path: 'following', select: 'username profilePicture' },
 				{ path: 'followers', select: 'username profilePicture' },
@@ -101,13 +115,68 @@ exports.login = async (req, res) => {
 		if (!user) return res.status(404).json({ message: 'User is not found', type: 'error' });
 
 		// Check password
-		const validPassword = await bcrypt.compare(password, user.password);
+		const validPassword = comparePassword(password, user.password);
 		if (!validPassword)
 			return res.status(400).json({ message: 'Wrong Password!', type: 'error' });
 
-		const token = sendToken(user);
+		const token = createAccessToken({ id: user._id });
+		const refresh_token = createRefreshToken({ id: user._id });
+
+		res.cookie('refreshtoken', refresh_token, {
+			httpOnly: true,
+			path: '/api/auth/refresh_token',
+			maxAge: 30 * 24 * 60 * 60 * 1000, // 30days
+		});
 
 		return res.status(200).json({
+			message: 'Login successfully',
+			type: 'success',
+			token,
+			user,
+		});
+	} catch (error) {
+		return res.status(500).json({ message: error.message, type: 'error' });
+	}
+};
+
+exports.logout = async (req, res) => {
+	try {
+		res.clearCookie('refreshtoken', { path: '/api/auth/refresh_token' });
+		return res.json({ message: 'Logged out!', type: 'success' });
+	} catch (error) {
+		return res.status(500).json({ message: error.message, type: 'error' });
+	}
+};
+
+exports.generateAccessToken = async (req, res) => {
+	try {
+		const rf_token = req.cookies.refreshtoken;
+		if (!rf_token) return res.status(400).json({ message: 'Please login now.', type: 'error' });
+
+		const decoded = verifyKey(rf_token, process.env.REFRESH_TOKEN_SECRET);
+		if (!decoded) return res.status(400).json({ message: 'Please login now.', type: 'error' });
+
+		const user = await User.findById(decoded.id)
+			.select('-password')
+			.populate([
+				{ path: 'following', select: 'username profilePicture' },
+				{ path: 'followers', select: 'username profilePicture' },
+				{
+					path: 'noti',
+					populate: { path: 'user', select: 'username profilePicture' },
+				},
+				{
+					path: 'saved',
+					populate: { path: 'author', select: 'username profilePicture' },
+				},
+			])
+			.lean();
+
+		if (!user) return res.status(404).json({ message: 'User is not found', type: 'error' });
+
+		const token = createAccessToken({ id: decoded.id });
+
+		res.json({
 			message: 'Login successfully',
 			type: 'success',
 			token,
