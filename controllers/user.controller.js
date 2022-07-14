@@ -160,9 +160,11 @@ exports.updateUser = async (req, res) => {
 
 	if (req.body.action === 'clearNoti') {
 		try {
-			const noti = await User.updateMany(
+			await User.updateMany(
 				{ _id: id, 'noti.isRead': false },
-				{ isRead: true }
+				{
+					$set: { 'noti.$.isRead': true },
+				}
 			).lean();
 
 			return res.status(200);
