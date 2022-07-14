@@ -84,7 +84,7 @@ const SocketServer = (socket, io) => {
 		// neu clients offline
 		// luu truoc vao db
 		offlineClients.forEach(async (client) => {
-			await User.findByIdAndUpdate(client._id, {
+			await User.findByIdAndUpdate(client.id, {
 				$push: {
 					noti: {
 						user: new mongoose.Types.ObjectId(msg.userId),
@@ -99,7 +99,7 @@ const SocketServer = (socket, io) => {
 		// neu clients online
 		onlineClients.forEach(async (client) => {
 			const noti = await User.findByIdAndUpdate(
-				client._id,
+				client.id,
 				{
 					$push: {
 						noti: {
