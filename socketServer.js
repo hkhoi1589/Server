@@ -97,16 +97,16 @@ const SocketServer = (socket, io) => {
 		});
 
 		// neu clients online
-		onlineClients.forEach((client) => {
+		onlineClients.forEach(async (client) => {
 			const noti = await User.findByIdAndUpdate(
 				client._id,
 				{
 					$push: {
 						noti: {
 							user: new mongoose.Types.ObjectId(msg.userId),
-						text: msg.text,
-						url: msg.url,
-						isRead: false,
+							text: msg.text,
+							url: msg.url,
+							isRead: false,
 						},
 					},
 				},
