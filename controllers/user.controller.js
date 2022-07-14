@@ -158,6 +158,15 @@ exports.updateUser = async (req, res) => {
 		}
 	}
 
+	if (req.body.action === 'clearNoti') {
+		try {
+			const noti = await User.updateMany({ isRead: false }, { isRead: true }).lean();
+			return res.status(200);
+		} catch (error) {
+			return res.status(500).json({ message: error.message, type: 'error' });
+		}
+	}
+
 	try {
 		const existedUser = await User.findOne({ email, _id: { $nin: [id] } }); // kiem tra trung email, ngoai tru user
 		if (existedUser)
