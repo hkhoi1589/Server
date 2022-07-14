@@ -123,7 +123,7 @@ exports.updateUser = async (req, res) => {
 	const { username, email, password, desc, coverPicture, profilePicture } = req.body;
 	const id = getUserId(req);
 
-	if (req.body.action === 'clearNoti') {
+	if (req.body.action === 'readNoti') {
 		try {
 			await User.updateMany(
 				{ _id: id },
